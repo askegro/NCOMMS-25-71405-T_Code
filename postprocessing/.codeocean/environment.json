@@ -1,0 +1,8 @@
+{
+	"version": 1,
+	"base_image": "registry.codeocean.com/codeocean/matlab:2024a-ubuntu22.04",
+	"args": [
+		"MLM_LICENSE_FILE"
+	],
+	"options": {}
+}
