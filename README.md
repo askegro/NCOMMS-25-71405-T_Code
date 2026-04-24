@@ -1,9 +1,9 @@
-# RGM — Reconfigurable Battery Pack Simulation and Analysis
+﻿# RGM â€” Reconfigurable Battery Pack Simulation and Analysis
 
 This repository contains the complete simulation and postprocessing
 code used in:
 
-> A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
+> A. Å kegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
 > *System-level benefits of dynamic reconfiguration in electric vehicle
 > battery packs: Lifetime extension and economic viability*,
 > Nature Communications (2026).
@@ -14,13 +14,13 @@ code used in:
 
 ```
 RGM/
-├── simulation/          # Core Monte Carlo simulation framework
-│   ├── files/           # MATLAB routines, cell models, drive cycle data
-│   └── run_RGM.sh       # SLURM job array script (HPC cluster)
-└── postprocessing/      # Figure generation and economic analysis
-    ├── code/            # MATLAB scripts for all figures
-    ├── data/            # Raw simulation outputs and processed data
-    └── results/         # Generated figures (written on execution)
+â”œâ”€â”€ simulation/          # Core Monte Carlo simulation framework
+â”‚   â”œâ”€â”€ files/           # MATLAB routines, cell models, drive cycle data
+â”‚   â””â”€â”€ run_RGM.sh       # SLURM job array script (HPC cluster)
+â””â”€â”€ postprocessing/      # Figure generation and economic analysis
+    â”œâ”€â”€ code/            # MATLAB scripts for all figures
+    â”œâ”€â”€ data/            # Raw simulation outputs and processed data
+    â””â”€â”€ results/         # Generated figures (written on execution)
 ```
 
 ---
@@ -83,7 +83,7 @@ RGM_MATLAB_Main_f(1, 1, 4, 25, 0.00, 0.20)
 If you use this code, please cite:
 
 ```
-A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
+A. Å kegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
 System-level benefits of dynamic reconfiguration in electric vehicle
 battery packs: Lifetime extension and economic viability,
 Nature Communications, 2026.
@@ -91,6 +91,11 @@ Nature Communications, 2026.
 
 ---
 
-## Licence
+## License
 
-Please refer to the licence file for terms of use.
+Source code in this repository is licensed under the MIT License; see LICENSE.
+
+Data files in postprocessing/data/ are dedicated to the public domain under CC0 1.0; see postprocessing/data/LICENSE.
+
+If you use this repository, please cite the associated publication.
+
