@@ -3,8 +3,8 @@
 This repository contains the core simulation framework used in:
 
 > A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
-> *System-level benefits of dynamic reconfiguration in electric vehicle
-> battery packs: Lifetime extension and economic viability*,
+> *System-Level Assessment of Dynamic Reconfiguration for Lifetime and Cost
+Outcomes in Electric Vehicle Battery Packs*,
 > Nature Communications (2026).
 
 The framework evaluates the lifetime extension achievable by reconfigurable battery packs (RBPs) relative to conventional fixed-configuration battery packs (CBPs) using large-scale Monte Carlo simulations with cell-level electrical and ageing models.
@@ -184,8 +184,8 @@ If you use this code, please cite:
 
 ```
 A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
-System-level benefits of dynamic reconfiguration in electric vehicle
-battery packs: Lifetime extension and economic viability,
+System-Level Assessment of Dynamic Reconfiguration for Lifetime and Cost
+Outcomes in Electric Vehicle Battery Packs,
 Nature Communications, 2026.
 ```
 
