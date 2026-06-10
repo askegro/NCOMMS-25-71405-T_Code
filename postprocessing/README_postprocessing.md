@@ -5,11 +5,11 @@ the figures and economic analysis reported in:
 
 > A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
 > *System-Level Assessment of Dynamic Reconfiguration for Lifetime and Cost
-Outcomes in Electric Vehicle Battery Packs*,
+> Outcomes in Electric Vehicle Battery Packs*,
 > Nature Communications (2026).
 
-All figures can be reproduced directly from the raw simulation data
-included in `data/raw/` without rerunning the simulations.
+All figures can be reproduced directly from the pre-computed simulation data
+included in `data/` without rerunning the simulations.
 
 ---
 
@@ -19,31 +19,31 @@ included in `data/raw/` without rerunning the simulations.
 postprocessing/
 ├── code/
 │   ├── batchProcessData/
-│   │   └── batchProcessData_v2.m       # Aggregates raw .mat files into summary structures
+│   │   └── batchProcessData.m               # Aggregates raw .mat files into summary structures
+│   ├── fig2/
+│   │   └── Fig2_SuppFig2.m                  # Fig. 2 and Supplementary Fig. S2
 │   ├── fig3/
-│   │   └── Fig3_SuppFig1.m             # Fig. 3 and Supplementary Fig. S1
-│   ├── fig4/
-│   │   └── Fig4_SuppTableS2.m          # Fig. 4 and Supplementary Table S2
-│   ├── fig5/
-│   │   ├── Fig5_SuppFig2_SuppFig3.m    # Figs. 4 & 5 and Supplementary Figs. S2 & S3
-│   │   └── Fig5_SuppFig_EnergySensitivity.m  # Supplementary Fig. S5 (energy sensitivity)
-│   ├── run_all_figures.m               # Runs all figure scripts end-to-end
-│   └── run                             # Shell script entry point (Code Ocean)
+│   │   └── Fig3_SuppTableS4.m               # Fig. 3 and Supplementary Table S4
+│   ├── fig4-5/
+│   │   ├── Fig4_5_SuppFig3_SuppFig4.m       # Figs. 4 & 5 and Supplementary Figs. S3 & S4
+│   │   └── SuppFig5.m                       # Supplementary Fig. S5 (energy sensitivity)
+│   ├── run_all_figures.m                    # Runs all figure scripts end-to-end
+│   └── run                                  # Shell script entry point (Code Ocean)
 ├── data/
-│   ├── raw/                            # Raw simulation output files (240 scenarios)
+│   ├── raw/                                 # Raw simulation output files (240 scenarios)
 │   │   └── out_CHEM_*_TC_*_Ns_*_T_*_Tsig_*_Trest_*_1000*.mat
 │   ├── processed/
-│   │   └── EV_Data.mat                 # Processed EV database (voltages, chemistries)
-│   ├── results_EFC_2025_06.mat         # Aggregated lifetime extension results
-│   ├── results_summary_2026_06.mat     # Summary statistics across all scenarios
-│   └── EVs_Voltages_Nominal.xlsx       # Representative EV model database
+│   │   └── EV_Data.mat                      # Processed EV database (written at runtime)
+│   ├── results_EFC_2025_06.mat              # Aggregated lifetime extension results
+│   ├── results_summary_2026_06.mat          # Summary statistics across all scenarios
+│   └── EVs_Voltages_Nominal.xlsx            # Representative EV model database
 ├── results/
-│   ├── fig3/                           # Output figures from Fig3_SuppFig1.m
-│   ├── fig4/                           # Output figures from Fig4_SuppTableS2.m
-│   └── fig5/                           # Output figures from Fig5 scripts
+│   ├── fig2/                                # Output figures from Fig2_SuppFig2.m
+│   ├── fig3/                                # Output figures from Fig3_SuppTableS4.m
+│   └── fig4-5/                              # Output figures from Fig4-5 scripts
 ├── environment/
-│   └── Dockerfile                      # Docker environment specification (Code Ocean)
-└── REPRODUCING.md                      # Code Ocean reproduction instructions
+│   └── Dockerfile                           # Docker environment specification (Code Ocean)
+└── REPRODUCING.md                           # Code Ocean reproduction instructions
 ```
 
 ---
@@ -74,12 +74,19 @@ This runs all figure scripts sequentially and saves all outputs to the
 
 ### Option 2: Run individual figure scripts
 
+Each script must be run from its own subfolder (this sets the path context
+that the scripts rely on):
+
 ```matlab
-cd code
-Fig3_SuppFig1              % Fig. 3 and Supplementary Fig. S1
-Fig4_SuppTableS2           % Fig. 4 and Supplementary Table S2
-Fig5_SuppFig2_SuppFig3     % Figs. 4 & 5 and Supplementary Figs. S2 & S3
-Fig5_SuppFig_EnergySensitivity  % Supplementary Fig. S5
+cd code/fig2
+Fig2_SuppFig2              % Fig. 2 and Supplementary Fig. S2
+
+cd ../fig3
+Fig3_SuppTableS4           % Fig. 3 and Supplementary Table S4
+
+cd ../fig4-5
+Fig4_5_SuppFig3_SuppFig4   % Figs. 4 & 5 and Supplementary Figs. S3 & S4
+SuppFig5                   % Supplementary Fig. S5
 ```
 
 ### Option 3: Reproduce via Docker (Code Ocean)
@@ -126,10 +133,10 @@ changes.
 All generated figures and tables are saved automatically to:
 
 ```
-results/fig3/    # Outputs from Fig3_SuppFig1.m
-results/fig4/    # Outputs from Fig4_SuppTableS2.m
-results/fig5/    # Outputs from Fig5_SuppFig2_SuppFig3.m
-                 # and Fig5_SuppFig_EnergySensitivity.m
+results/fig2/     # Outputs from Fig2_SuppFig2.m
+results/fig3/     # Outputs from Fig3_SuppTableS4.m
+results/fig4-5/   # Outputs from Fig4_5_SuppFig3_SuppFig4.m
+                  # and SuppFig5.m
 ```
 
 These folders are created during execution if they do not already exist.
