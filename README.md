@@ -39,14 +39,14 @@ Monte Carlo iterations with stochastic cell-to-cell manufacturing
 variability. The full sweep was executed on the National Academic
 Infrastructure for Supercomputing in Sweden (NAISS), accessed through
 Chalmers University of Technology. Individual scenarios can be run on
-a standard MATLAB workstation. See `simulation/README.md` for details.
+a standard MATLAB workstation. See `simulation/README_simulation.md` for details.
 
 **2. Postprocessing** (`postprocessing/`)
 
 Generates all figures and the economic analysis reported in the paper,
 reading directly from the raw simulation output files included in
 `postprocessing/data/raw/`. All figures can therefore be reproduced
-without rerunning the simulations. See `postprocessing/README.md`
+without rerunning the simulations. See `postprocessing/README_postprocessing.md`
 for details.
 
 ---
