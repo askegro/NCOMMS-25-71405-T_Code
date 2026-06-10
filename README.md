@@ -1,4 +1,4 @@
-﻿# RGM — Reconfigurable Battery Pack Simulation and Analysis
+﻿# Reconfigurable Battery Pack Simulation and Analysis
 
 This repository contains the complete simulation and postprocessing
 code used in:
@@ -14,7 +14,7 @@ Outcomes in Electric Vehicle Battery Packs*,
 ## Repository structure
 
 ```text
-RGM/
+NCOMMS-25-71405-T_Code/
 ├── simulation/          # Core Monte Carlo simulation framework
 │   ├── files/           # MATLAB routines, cell models, drive cycle data
 │   └── run_RGM.sh       # SLURM job array script (HPC cluster)
