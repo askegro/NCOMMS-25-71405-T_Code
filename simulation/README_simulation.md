@@ -71,7 +71,9 @@ numSims = double(1000);
 ```
 to a smaller value, e.g. `numSims = double(10)`.
 ---
+
 ## Input parameters
+
 | Parameter | Description | Units | Values used in paper |
 |---|---|---|---|
 | `FLAG_CHEMISTRY` | Cell chemistry | — | 1 (LFP), 2 (NMC) |
@@ -81,14 +83,18 @@ to a smaller value, e.g. `numSims = double(10)`.
 | `CELL_T_SIGMA` | Std. deviation of cell temperature | °C | 0.00, 0.42, 0.83 |
 | `TIME_REST_PERC_DAY` | Fraction of day spent at rest | — | 0.20, 0.95 |
 Note: `N_ser = 16` is used for NMC and `N_ser = 14` for LFP at the approximately 50 V voltage class. All other `N_ser` values are identical across chemistries.
+
 ---
-## Output
+### Output
 Each simulation run produces a `.mat` file named:
 ```
 out_CHEM_<c>_TC_<tc>_Ns_<n>_T_<t>_Tsig_<ts>_Trest_<tr>_1000.mat
 ```
 where the tags encode the input parameter combination. The file contains two structures:
-### `Outputs`
+---
+
+### Outputs
+
 | Field | Description | Units |
 |---|---|---|
 | `chi_EFC_perc_All` | Lifetime extension per Monte Carlo run (EFC-based) | % |
@@ -101,8 +107,13 @@ where the tags encode the input parameter combination. The file contains two str
 | `dR_cell_i` | Cell resistance scaling factor at EOL, per run | p.u. |
 | `simTime_iter_All` | Wall-clock time per Monte Carlo iteration | s |
 The primary output used in the paper is `chi_EFC_perc_All`, from which the mean lifetime extension $\bar{\chi}$ and its standard deviation $s_\chi$ are computed across the 1,000 Monte Carlo runs.
-### `Experiment`
+
+---
+
+### Experiment
+
 Records the fixed simulation configuration: `FLAG_CHEMISTRY`, `FLAG_AGINGMODEL_TC`, `FLAG_CURRENTINPUT`, `N_ser`, `CELL_T`, `CELL_T_SIGMA`.
+
 ---
 ## Full parameter sweep: HPC cluster
 The complete sweep reported in the paper comprises 240 scenarios (216 LFP + 24 NMC), each with 1,000 Monte Carlo iterations, submitted as a SLURM job array on the National Academic Infrastructure for Supercomputing in Sweden (NAISS), accessed through Chalmers University of Technology. The submission script `run_RGM.sh` is configured for the C3SE Vera cluster and uses 40 parallel cores per job.
@@ -117,9 +128,12 @@ Note that `run_RGM.sh` uses `RunMatlab.sh`, a C3SE-specific wrapper that restart
 matlab -nodisplay -nosplash -r "RGM_MATLAB_Main_f(...); exit;"
 ```
 ---
+
 ## Reproducibility
+
 The global RNG is seeded at `41` (Mersenne Twister) and per-worker streams use a Threefry generator seeded at `42` with per-iteration substreams, ensuring reproducible results regardless of worker assignment order.
 Post-processing scripts used to generate all figures and the economic analysis in the paper are available via Code Ocean.
+
 ---
 ## Cell model references
 The electrical and ageing models are adopted from the sources below without re-identification of parameters.
