@@ -83,4 +83,5 @@ RunMatlab.sh -o "-nodisplay -nosplash -r \"RGM_MATLAB_Main_f( \
     ${CELL_T_SIGMA}, \
     ${TIME_REST_PERC_DAY}); exit;\"" < /dev/null
 
+mkdir -p $SLURM_SUBMIT_DIR/Results
 cp out_*.mat $SLURM_SUBMIT_DIR/Results/
