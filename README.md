@@ -4,8 +4,9 @@ This repository contains the complete simulation and postprocessing
 code used in:
 
 > A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
-> *System-level benefits of dynamic reconfiguration in electric vehicle
-> battery packs: Lifetime extension and economic viability*,
+> *System-Level Assessment of Dynamic Reconfiguration
+> for Lifetime and Cost
+Outcomes in Electric Vehicle Battery Packs*,
 > Nature Communications (2026).
 
 ---
@@ -84,8 +85,8 @@ If you use this code, please cite:
 
 ```
 A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
-System-level benefits of dynamic reconfiguration in electric vehicle
-battery packs: Lifetime extension and economic viability,
+System-Level Assessment of Dynamic Reconfiguration for Lifetime and Cost
+Outcomes in Electric Vehicle Battery Packs,
 Nature Communications, 2026.
 ```
 
