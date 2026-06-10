@@ -69,7 +69,9 @@ The default number of Monte Carlo iterations is `numSims = 1000`. For quick veri
 ```matlab
 numSims = double(1000);
 ```
+
 to a smaller value, e.g. `numSims = double(10)`.
+
 ---
 
 ## Input parameters
@@ -90,7 +92,9 @@ Each simulation run produces a `.mat` file named:
 ```
 out_CHEM_<c>_TC_<tc>_Ns_<n>_T_<t>_Tsig_<ts>_Trest_<tr>_1000.mat
 ```
+
 where the tags encode the input parameter combination. The file contains two structures:
+
 ---
 
 ### Outputs
