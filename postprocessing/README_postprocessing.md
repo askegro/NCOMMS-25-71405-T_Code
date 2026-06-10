@@ -4,8 +4,8 @@ This folder contains all scripts, data, and outputs required to reproduce
 the figures and economic analysis reported in:
 
 > A. Škegro, T. Wik, B. Bijlenga, A. Bessman, C. Zou,
-> *System-level benefits of dynamic reconfiguration in electric vehicle
-> battery packs: Lifetime extension and economic viability*,
+> *System-Level Assessment of Dynamic Reconfiguration for Lifetime and Cost
+Outcomes in Electric Vehicle Battery Packs*,
 > Nature Communications (2026).
 
 All figures can be reproduced directly from the raw simulation data
