@@ -7,25 +7,39 @@ close all; clc;
 %% ===== Code Ocean / portable paths setup =====
 ROOT_DIR = fileparts(CODE_DIR); %fileparts(fileparts(CODE_DIR));
 DATA_DIR = fullfile(ROOT_DIR, 'data');
-RESULTS_DIR = fullfile(ROOT_DIR, 'results', 'fig5'); 
+RESULTS_DIR = fullfile(ROOT_DIR, 'results', 'fig4-5'); 
 if (~isfolder(RESULTS_DIR))
     mkdir(RESULTS_DIR); 
 end  
+
+% Global defaults
+set(groot, 'DefaultAxesTickLabelInterpreter', 'tex');
+set(groot, 'DefaultTextInterpreter', 'tex');
+set(groot, 'DefaultLegendInterpreter', 'tex');
+set(groot, 'DefaultAxesFontName', 'Helvetica');
+set(groot, 'DefaultTextFontName', 'Helvetica');
+set(groot, 'DefaultLegendFontName', 'Helvetica');
+
+set(groot, 'DefaultAxesFontSize', 7);
+set(groot, 'DefaultTextFontSize', 7);
+set(groot, 'DefaultLegendFontSize', 7);
 
 % === Output targets ===
 % Figure 5 is split into two files:
 %   Figure5a: panels (a)-(d) — cost composition and NPC trajectories
 %   Figure5b: panels (a)-(f) — sensitivity analysis (formerly panels e-j)
-OUT_FIG5A_PDF  = fullfile(RESULTS_DIR, 'Figure5a_pdfformat.pdf');
-OUT_FIG5A_EPS  = fullfile(RESULTS_DIR, 'Figure5a_epsformat.eps');
-OUT_FIG5A_FIG  = fullfile(RESULTS_DIR, 'Figure5a_figformat.fig');
-OUT_FIG5B_PDF  = fullfile(RESULTS_DIR, 'Figure5b_pdfformat.pdf');
-OUT_FIG5B_EPS  = fullfile(RESULTS_DIR, 'Figure5b_epsformat.eps');
-OUT_FIG5B_FIG  = fullfile(RESULTS_DIR, 'Figure5b_figformat.fig');
-OUT_SUPP2_PDF  = fullfile(RESULTS_DIR, 'SuppFig2_pdfformat.pdf');
-OUT_SUPP2_FIG  = fullfile(RESULTS_DIR, 'SuppFig2_figformat.fig');
-OUT_SUPP3_PDF  = fullfile(RESULTS_DIR, 'SuppFig3_pdfformat.pdf');
-OUT_SUPP3_FIG  = fullfile(RESULTS_DIR, 'SuppFig3_figformat.fig');
+OUT_FIG4_PDF  = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_4.pdf');
+OUT_FIG4_EPS  = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_4.eps');
+OUT_FIG4_FIG  = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_4.fig');
+OUT_FIG5_PDF  = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_5.pdf');
+OUT_FIG5_EPS  = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_5.eps');
+OUT_FIG5_FIG  = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_5.fig');
+OUT_SUPP3_PDF  = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_3.pdf');
+OUT_SUPP3_EPS  = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_3.eps');
+OUT_SUPP3_FIG  = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_3.fig');
+OUT_SUPP4_PDF  = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_4.pdf');
+OUT_SUPP4_EPS  = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_4.eps');
+OUT_SUPP4_FIG  = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_4.fig');
 
 
 
@@ -45,6 +59,11 @@ paramRanges                 = getParamRanges();
 
 %% %%%%%%%%%%%%%%%%%%%%%%% SAMPLE & PLOT MULTIVARIATE SENSITIVITY %%%%%%%%%%%%%%%%%%%%%%%
 n_samples = 100000;
+% Figure-export note:
+% The plotting functions below deterministically decimate only
+% the displayed scatter clouds; all fitted lines, medians, rectangles,
+% boxcharts, and selected scenarios are still computed from the full
+% sample set.
 
 % ---------- Run the experiment ----------
 [samples, delta_NPC, results_all, p_out_all] = sampleDeltaNPC_LHS(paramRanges, n_samples, paramsBaseline);
@@ -75,65 +94,66 @@ idx.worst               = idx_min;
 %  FIGURE 5a: Cost composition and cumulative NPC trajectories
 %  Panels (a)-(d)
 % ======================================================================
-
+% 
 ylims_Main   = [-3 6];
 yticks_Main  = [-3 0 3 6];
 dotSize      = 1;
 dotSize2     = 10;
 
-figCosts = figure;
-tl_costs = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'none');
+% --- Figure 4 size: Nature 2-column, preserve original Fig. 4 ratio ---
+paperWidth  = 18.0;      % 180 mm, Nature 2-column original research
+paperHeight = 14.0;      %
+
+figCosts = figure( ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'Color', 'w');
+tl_costs = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
 
 % --- Panel (a): Annual cost breakdown, spans full first row ---
 axAnnualCost = nexttile(tl_costs, 1, [1 3]);
 yLim_axAnnual   = [-3 9];
 yTicks_axAnnual = [-3 0 3 6 9];
 plotAnnualCostBreakdown_DiscNonDisc_Subplot(axAnnualCost, resultBaseline, yLim_axAnnual, yTicks_axAnnual, 'nondiscounted');
-addPanelLabel(axAnnualCost, '\textbf{(a)}', -0.065, 1, 12);
+addPanelLabel(axAnnualCost, '(\bfa\rm)', -0.05, 1, 7);
 
 % --- Panel (b): Best-case cumulative NPC ---
 axBestCase = nexttile(tl_costs);
 yLim_axBest   = [10 30];
 yTicks_axBest = [10 15 20 25 30];
 plotCumulativeNPC_DiscNonDisc_Subplot(axBestCase, resultBest, true, true, "northwest", "Best", resultBest.delta_NPC, yLim_axBest, yTicks_axBest, 'discounted');
-addPanelLabel(axBestCase, '\textbf{(b)}', -0.25, 1, 12);
+addPanelLabel(axBestCase, '(\bfb\rm)', -0.2, 1, 7);
 
 % --- Panel (c): Baseline cumulative NPC ---
 axBaselineCase = nexttile(tl_costs);
 yLim_axBaseline   = [5 25];
 yTicks_axBaseline = [5 10 15 20 25];
 plotCumulativeNPC_DiscNonDisc_Subplot(axBaselineCase, resultBaseline, true, true, "northwest", "Baseline", resultBaseline.delta_NPC, yLim_axBaseline, yTicks_axBaseline, 'discounted');
-addPanelLabel(axBaselineCase, '\textbf{(c)}', -0.235, 1, 12);
+addPanelLabel(axBaselineCase, '(\bfc\rm)', -0.2, 1, 7);
 
 % --- Panel (d): Worst-case cumulative NPC ---
 axWorstCase = nexttile(tl_costs);
 yLim_axWorst   = [0 60];
 yTicks_axWorst = [0 20 40 60];
 plotCumulativeNPC_DiscNonDisc_Subplot(axWorstCase, resultWorst, true, true, "northwest", "Worst", resultWorst.delta_NPC, yLim_axWorst, yTicks_axWorst, 'discounted');
-addPanelLabel(axWorstCase, '\textbf{(d)}', -0.235, 1, 12);
+addPanelLabel(axWorstCase, '(\bfd\rm)', -0.2, 1, 7);
 
-% --- Export Figure 5a ---
-screens    = get(0, 'MonitorPositions');
-targetMonitor = 1;
-paperWidth  = 21.0;
-paperHeight = 29.7 * 0.55;
-dpi         = get(0, 'ScreenPixelsPerInch');
-cm_to_inch  = 1/2.54;
-width_px    = round(paperWidth  * cm_to_inch * dpi);
-height_px   = round(paperHeight * cm_to_inch * dpi);
-mon         = screens(targetMonitor, :);
 
-set(figCosts, 'Units', 'pixels');
-set(figCosts, 'Position', [mon(1), mon(2) + mon(4) - height_px - 100, width_px, height_px]);
-set(figCosts, 'PaperUnits', 'centimeters');
-set(figCosts, 'PaperSize',         [paperWidth paperHeight]);
-set(figCosts, 'PaperPosition',     [0 0 paperWidth paperHeight]);
-set(figCosts, 'PaperPositionMode', 'manual');
+set(figCosts, ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'PaperUnits', 'centimeters', ...
+    'PaperSize', [paperWidth paperHeight], ...
+    'PaperPosition', [0 0 paperWidth paperHeight], ...
+    'PaperPositionMode', 'manual', ...
+    'Color', 'w');
 
-exportgraphics(figCosts, OUT_FIG5A_PDF, 'ContentType', 'image',  'Resolution', 300);
-%exportgraphics(figCosts, OUT_FIG5A_EPS, 'ContentType', 'vector');
-%saveas(figCosts, OUT_FIG5A_FIG);
-fprintf('Figure 5a exported.\n');
+drawnow;
+
+exportgraphics(figCosts, OUT_FIG4_PDF, 'ContentType', 'vector', 'BackgroundColor','white');
+exportgraphics(figCosts, OUT_FIG4_EPS, 'ContentType', 'vector', 'BackgroundColor','white');
+saveas(figCosts, OUT_FIG4_FIG);
+fprintf('Figure 4 exported.\n');
 
 
 
@@ -142,52 +162,59 @@ fprintf('Figure 5a exported.\n');
 %  Panels (a)-(f)  [formerly panels (e)-(j) of the original Fig. 5]
 % ======================================================================
 
-figSens = figure;
-tl_sens = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'none');
+% --- Figure 5 size: Nature 2-column, preserve original Fig. 5 ratio ---
+paperWidth  = 18.0;      % 180 mm, Nature 2-column original research
+paperHeight = 14.0;      % 
+
+figSens = figure( ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'Color', 'w');
+tl_sens = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
 
 % --- Panel (a): Global sensitivity ranking (Spearman) ---
 axSpearman = nexttile(tl_sens);
 tornadoPlotDeltaNPC_Subplot(axSpearman, samples, delta_NPC_kEuros);
-addPanelLabel(axSpearman, '\textbf{(a)}', -0.235, 1, 12);
+addPanelLabel(axSpearman, '(\bfa\rm)', -0.15, 1, 7);
 
 % --- Panel (b): 1D sensitivity to E_pack_nom ---
 axEpacknom = nexttile(tl_sens);
 x_axEpack     = samples.E_pack_nom;
 y_axEpack     = delta_NPC_kEuros;
-xLabel_axEpack = '$E^{\mathrm{nom}}_{\mathrm{pack}}$ [kWh]';
+xLabel_axEpack = 'E_{pack}^{nom} [kWh]';
 xLim_axEpack  = [10 130];
 xTicks_axEpack = 20:20:120;
 [x_zero_E, R_squared_E, RMSE_E] = plotSensitivity1D_NoPerc_Subplot( ...
     axEpacknom, x_axEpack, y_axEpack, xLabel_axEpack, xLim_axEpack, xTicks_axEpack, ...
     ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize2);
-addPanelLabel(axEpacknom, '\textbf{(b)}', -0.235, 1, 12);
+addPanelLabel(axEpacknom, '(\bfb\rm)', -0.15, 1, 7);
 
 % --- Panel (c): 1D sensitivity to L ---
 axL = nexttile(tl_sens);
 xlims_L  = [5000 70000];
 xticks_L = 5000:20000:70000;
 [x_zero_L, R_squared_L, RMSE_L] = plotSensitivity1D_NoPerc_Subplot( ...
-    axL, samples.L, delta_NPC_kEuros, '$L$ [km]', xlims_L, xticks_L, ...
+    axL, samples.L, delta_NPC_kEuros, 'L [km]', xlims_L, xticks_L, ...
     ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize, "northwest");
-addPanelLabel(axL, '\textbf{(c)}', -0.235, 1, 12);
+addPanelLabel(axL, '(\bfc\rm)', -0.15, 1, 7);
 
 % --- Panel (d): 1D sensitivity to nu ---
 axnu = nexttile(tl_sens);
 x_axnu      = samples.nu;
 y_axnu      = delta_NPC_kEuros;
-xLabel_axnu = '$\nu\,[\%]$';
+xLabel_axnu = '\nu [%]';
 xlims_axnu  = [0 16];
 xticks_axnu = [0 5 10 15];
 [x_zero_nu, R_squared_nu, RMSE_nu] = plot1DWithRegression_Subplot( ...
     axnu, x_axnu, y_axnu, xLabel_axnu, xlims_axnu, xticks_axnu, ...
     ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize);
-addPanelLabel(axnu, '\textbf{(d)}', -0.235, 1, 12);
+addPanelLabel(axnu, '(\bfd\rm)', -0.15, 1, 7);
 
 % --- Panels (e) and (f): Design-space rectangle and chemistry boxplot ---
 axRectPlot = nexttile(tl_sens);
 xLim_axRectPlot   = [0 15.1];
 xTicks_axRectPlot = [0 5 10 15];
-yLim_axRectPlot   = [4500 82000];
+yLim_axRectPlot   = [4500 89000];
 yTicks_axRectPlot = [10000 30000 50000 70000];
 
 axChemPlot = nexttile(tl_sens);
@@ -198,133 +225,132 @@ dotSize          = 1;
     axChemPlot, axRectPlot, samples, delta_NPC, ...
     rect_bounds, ylims_Main, yticks_Main, true, successThreshold, dotSize, ...
     xLim_axRectPlot, xTicks_axRectPlot, yLim_axRectPlot, yTicks_axRectPlot);
-addPanelLabel(axRectPlot, '\textbf{(e)}', -0.235, 1, 12);
-addPanelLabel(axChemPlot, '\textbf{(f)}', -0.235, 1, 12);
+addPanelLabel(axRectPlot, '(\bfe\rm)', -0.15, 1, 7);
+addPanelLabel(axChemPlot, '(\bff\rm)', -0.15, 1, 7);
 fprintf('nu < %.4g and delta < %.4g\n', nu_best, L_best);
 
-% --- Export Figure 5b ---
-paperHeight = 29.7 * 0.55;
-height_px   = round(paperHeight * cm_to_inch * dpi);
+set(figSens, ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'PaperUnits', 'centimeters', ...
+    'PaperSize', [paperWidth paperHeight], ...
+    'PaperPosition', [0 0 paperWidth paperHeight], ...
+    'PaperPositionMode', 'manual', ...
+    'Color', 'w');
 
-set(figSens, 'Units', 'pixels');
-set(figSens, 'Position', [mon(1), mon(2) + mon(4) - height_px - 100, width_px, height_px]);
-set(figSens, 'PaperUnits', 'centimeters');
-set(figSens, 'PaperSize',         [paperWidth paperHeight]);
-set(figSens, 'PaperPosition',     [0 0 paperWidth paperHeight]);
-set(figSens, 'PaperPositionMode', 'manual');
+drawnow;
 
-exportgraphics(figSens, OUT_FIG5B_PDF, 'ContentType', 'image',  'Resolution', 300);
-%exportgraphics(figSens, OUT_FIG5B_EPS, 'ContentType', 'vector');
-%saveas(figSens, OUT_FIG5B_FIG);
-fprintf('Figure 5b exported.\n');
+exportgraphics(figSens, OUT_FIG5_PDF, 'ContentType', 'vector','BackgroundColor','white');
+exportgraphics(figSens, OUT_FIG5_EPS, 'ContentType', 'vector');
+saveas(figSens, OUT_FIG5_FIG);
+fprintf('Figure 5 exported.\n');
 
 
 
-%% ============================ SUPPLEMENTARY FIGURE S2 EXPORT ============================    
-figSuppFigure2 = figure;
+%% ============================ SUPPLEMENTARY FIGURE S3 EXPORT ============================
+paperWidth  = 18.0;      % 180 mm, Nature 2-column original research
+paperHeight = 12.73;      % 
 
-tlSupp = tiledlayout(2,3,'TileSpacing','compact','Padding','none');
+figSuppFigure3 = figure( ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'Color', 'w');
+
+tlSupp = tiledlayout(2,3,'TileSpacing','compact','Padding','compact');
+
 axdeltaLoss = nexttile(tlSupp);
 xlims_deltaLoss = [1 5];
 xticks_deltaLoss = 1:1:5;
 [x_zero_delta, R_squared_delta, RMSE_delta] = plot1DWithRegression_Subplot(axdeltaLoss, samples.delta_loss, delta_NPC_kEuros, ...
-    '$\delta_{\mathrm{loss}} \,[\%]$', xlims_deltaLoss, xticks_deltaLoss, ...
+    '\delta_{loss} [%]', xlims_deltaLoss, xticks_deltaLoss, ...
     ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize); 
-addPanelLabel(axdeltaLoss, '\textbf{(a)}', -0.2, 1, 12);
+addPanelLabel(axdeltaLoss, '(\bfa\rm)', -0.15, 1, 7);
 
 axdeltaalpha = nexttile(tlSupp);
 samples.delta_alpha     = samples.alpha_CBP - samples.alpha_RBP;
 x_axSupp1               = samples.delta_alpha; 
 y_axSupp1               = delta_NPC_kEuros; 
-xLabel_axSupp1          = '$\Delta \alpha \,[\%]$';
+xLabel_axSupp1          = '\Delta\alpha [%]';
 xLim_axSupp1            = [0.5 1.5];
 xTicks_axSupp1          = [0.5 1 1.5];
 plot1DWithRegression_Subplot(axdeltaalpha, x_axSupp1, y_axSupp1, xLabel_axSupp1, xLim_axSupp1, xTicks_axSupp1, ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize);
-addPanelLabel(axdeltaalpha, '\textbf{(b)}', -0.2, 1, 12);   
+addPanelLabel(axdeltaalpha, '(\bfb\rm)', -0.15, 1, 7);   
 
 axr = nexttile(tlSupp);
 x_axr               = samples.r_CBP; 
 y_axr               = delta_NPC_kEuros; 
-xLabel_axr          = '$r_{\mathrm{CBP}} = r_{\mathrm{RBP}} \,[\%]$';    
+xLabel_axr          = 'r [%]';    
 xlims_axr           = [2 4];
 xticks_axr          = [1 2 3 4 5];
 plotSensitivity1D_Subplot(axr, x_axr, y_axr, ...
 xLabel_axr, xlims_axr, xticks_axr, ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize);    
-addPanelLabel(axr, '\textbf{(c)}', -0.2, 1, 12);    
+addPanelLabel(axr, '(\bfc\rm)', -0.15, 1, 7);    
 
 axYEV = nexttile(tlSupp);
 x_axYEV               = samples.Y_EV; 
 y_axYEV               = delta_NPC_kEuros; 
-xLabel_axYEV          = '$Y_{\mathrm{EV}}$ [years]';    
+xLabel_axYEV          = 'Y_{{EV}} [years]';    
 xlims_axYEV           = [15 20];
 xticks_axYEV          = 15:1:20;
 plotSensitivity1D_Subplot(axYEV, x_axYEV/100, y_axYEV, xLabel_axYEV, xlims_axYEV, xticks_axYEV, ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize);  
-addPanelLabel(axYEV, '\textbf{(d)}', -0.2, 1, 12); 
+addPanelLabel(axYEV, '(\bfd\rm)', -0.15, 1, 7); 
 
 axSOHCBP = nexttile(tlSupp);
 x_axSOHCBP               = samples.SOH_EOL_SecondLife_CBP; 
 y_axSOHCBP               = delta_NPC_kEuros; 
-xLabel_axSOHCBP          = '$SOH^{\mathrm{CBP}}_{EOL2} \,[\%]$';
+xLabel_axSOHCBP          = 'SOH_{EOL2}^{CBP} [%]';
 xLim_axSOHCBP            = [50, 60];
 xTicks_axSOHCBP          = [50 55 60];
 plotSensitivity1D_Subplot(axSOHCBP, x_axSOHCBP, y_axSOHCBP, xLabel_axSOHCBP, xLim_axSOHCBP, xTicks_axSOHCBP, ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize);
-addPanelLabel(axSOHCBP, '\textbf{(e)}', -0.2, 1, 12);   
+addPanelLabel(axSOHCBP, '(\bfe\rm)', -0.15, 1, 7);   
 
 axSOHRBP = nexttile(tlSupp);
 x_axSOHRBP               = samples.SOH_EOL_SecondLife_RBP; 
 y_axSOHRBP               = delta_NPC_kEuros; 
-xLabel_axSOHRBP          = '$SOH^{\mathrm{RBP}}_{EOL2} \,[\%]$';    
+xLabel_axSOHRBP          = 'SOH_{EOL2}^{RBP} [%]';    
 xlims_axSOHRBP           = [40, 50];
 xticks_axSOHRBP          = [40 45 50];
 plotSensitivity1D_Subplot(axSOHRBP, x_axSOHRBP, y_axSOHRBP, ...
 xLabel_axSOHRBP, xlims_axSOHRBP, xticks_axSOHRBP, ylims_Main, yticks_Main, idx_max, idx_baseline, idx_min, dotSize);    
-addPanelLabel(axSOHRBP, '\textbf{(f)}', -0.2, 1, 12);   
-
-screens         = get(0,'MonitorPositions');
-targetMonitor   = 1; 
-
-% A4 dimensions (80% height)
-paperWidth      = 21.0;    % cm
-paperHeight     = 29.7 * 0.5; % 23.76 cm
-
-% Get screen DPI
-dpi             = get(0,'ScreenPixelsPerInch');
-cm_to_inch      = 1/2.54;
-
-% Convert to pixels
-width_px        = round(paperWidth * cm_to_inch * dpi);
-height_px       = round(paperHeight * cm_to_inch * dpi);
-
-% Get monitor position
-mon             = screens(targetMonitor,:);
-fig_left        = mon(1);
-fig_bottom      = mon(2);
-
-% Position figure in top-left of monitor with exact size
-set(figSuppFigure2, 'Units', 'pixels');
-set(figSuppFigure2, 'Position', [fig_left, fig_bottom + mon(4) - height_px - 100, width_px, height_px]);
+addPanelLabel(axSOHRBP, '(\bff\rm)', -0.15, 1, 7);   
 
 % Set PaperSize for export
-set(figSuppFigure2, 'PaperUnits', 'centimeters');
-set(figSuppFigure2, 'PaperSize', [paperWidth paperHeight]);
-set(figSuppFigure2, 'PaperPosition', [0 0 paperWidth paperHeight]);
-set(figSuppFigure2, 'PaperPositionMode', 'manual');
+set(figSuppFigure3, ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'PaperUnits', 'centimeters', ...
+    'PaperSize', [paperWidth paperHeight], ...
+    'PaperPosition', [0 0 paperWidth paperHeight], ...
+    'PaperPositionMode', 'manual', ...
+    'Color', 'w');
 
-exportgraphics(figSuppFigure2, OUT_SUPP2_PDF, 'ContentType','image','Resolution',300);
-%saveas(figSuppFigure2, OUT_SUPP2_FIG);
-fprintf('Supplementary Figure 2 exported.\n');
+drawnow;
+
+% Scatter-heavy artists are visually decimated inside the
+% plotting helpers, so the PDF remains vector without storing all 100000
+% samples as individual markers.
+exportgraphics(figSuppFigure3, OUT_SUPP3_PDF, 'ContentType','vector','BackgroundColor','white');
+exportgraphics(figSuppFigure3, OUT_SUPP3_EPS, 'ContentType','vector','BackgroundColor','white');
+saveas(figSuppFigure3, OUT_SUPP3_FIG);
+fprintf('Supplementary Figure 3 exported.\n');
 
 
 
-%% ============================ SUPPLEMENTARY FIGURE S3 EXPORT ============================
+%% ============================ SUPPLEMENTARY FIGURE S4 EXPORT ============================
+figSuppFigure4 = figure( ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'Color', 'w');
+tlSupp_2D = tiledlayout(figSuppFigure4, 1, 3, 'TileSpacing','compact','Padding','compact');
+
 xlims = {[0 15.1], [0 15.1], [1 5]};
 ylims = {[4500 82000], [1 5.85714], [4500 82000]};
 xticks = {[0 5 10 15], [0 5 10 15], [1 3 5]};
 yticks = {[10000 30000 50000 70000], [1 3 5], [10000 30000 50000 70000]};
 xVars = {"nu", "nu", "delta_loss"};
 yVars = {"L", "delta_loss", "L"};
-xLabels = {"$\nu\,[\%]$", "$\nu\,[\%]$", "$\delta_{\mathrm{loss}}\,[\%]$"};
-yLabels = {"$L$ [km]", "$\delta_{\mathrm{loss}}\,[\%]$", "$L$ [km]"};
+xLabels = {'\nu [%]', '\nu [%]', '\delta_{{loss}} [%]'};
+yLabels = {'L [km]', '\delta_{{loss}} [%]', 'L [km]'};
 xInPerc = [true, true, true];
 yInPerc = [false, true, false];
 boundsList = {
@@ -336,10 +362,8 @@ boundsList = {
 dotSize = 1;  
 successThreshold = 0.997;
 
-figSuppFigure3 = figure;
-tlSupp_2D = tiledlayout(figSuppFigure3, 1, 3, 'TileSpacing','compact','Padding','none');
 
-panelLetters = {'\textbf{(a)}','\textbf{(b)}','\textbf{(c)}'};
+panelLetters = {'(\bfa\rm)','(\bfb\rm)','(\bfc\rm)'};
 rectResults  = struct('panel',{},'xVar',{},'yVar',{},'edges',{},'altEdges',{},'success_rate',{},'x_max',{},'y_max',{});
 
 for i = 1:3
@@ -354,8 +378,8 @@ for i = 1:3
     xLabels{i}, yLabels{i}, ...
     0.95, true);   
 
-    set(axRect, 'TickLabelInterpreter','latex', 'FontName','Latin Modern Roman', 'FontSize',12);
-    addPanelLabel(axRect, panelLetters{i}, -0.20, 1, 12);
+    set(axRect, 'TickLabelInterpreter','tex', 'FontName','Helvetica', 'FontSize',7);
+    addPanelLabel(axRect, panelLetters{i}, -0.15, 1, 7);
 
     % Store for later use
     rectResults(i).panel        = char(panelLetters{i});
@@ -394,32 +418,32 @@ for i = 1:numel(rectResults)
     end
 end
 
-screens = get(0,'MonitorPositions');
-dpi = get(0,'ScreenPixelsPerInch');
-cm_to_inch = 1/2.54;
-paperWidth = 21.0;
-paperHeight = 29.7 * 0.4;
-width_px = round(paperWidth * cm_to_inch * dpi);
-height_px = round(paperHeight * cm_to_inch * dpi);
-mon = screens(targetMonitor,:);
-fig_left = mon(1);
-fig_bottom = mon(2);
+paperWidth  = 18.0;      % 180 mm, Nature 2-column original research
+paperHeight = 10.18;      % 
 
-set(figSuppFigure3, 'Units', 'pixels', ...
-    'Position', [fig_left, fig_bottom + mon(4) - height_px - 100, width_px, height_px]);
-set(figSuppFigure3, 'PaperUnits', 'centimeters', ...
+set(figSuppFigure4, ...
+    'Units', 'centimeters', ...
+    'Position', [2 2 paperWidth paperHeight], ...
+    'PaperUnits', 'centimeters', ...
     'PaperSize', [paperWidth paperHeight], ...
     'PaperPosition', [0 0 paperWidth paperHeight], ...
-    'PaperPositionMode', 'manual');
+    'PaperPositionMode', 'manual', ...
+    'Color', 'w');
 
-exportgraphics(figSuppFigure3, OUT_SUPP3_PDF, 'ContentType','image','Resolution',300);
-%saveas(figSuppFigure3, OUT_SUPP3_FIG);
-fprintf('Supplementary Figure 3 exported.\n');
+drawnow;
+
+
+% Export as vector. The 2D rectangle plots below draw only a deterministic
+% visual subset of the sample cloud; rectangle selection still uses the full
+% 100000-sample dataset.
+exportgraphics(figSuppFigure4, OUT_SUPP4_PDF, 'ContentType','vector','BackgroundColor','white');
+exportgraphics(figSuppFigure4, OUT_SUPP4_EPS, 'ContentType','vector','BackgroundColor','white');
+saveas(figSuppFigure4, OUT_SUPP4_FIG);
+fprintf('Supplementary Figure 4 exported.\n');
 
 figs = findall(0, 'Type', 'figure');
-close(setdiff(figs, [figCosts, figSens, figSuppFigure2, figSuppFigure3]));
+close(setdiff(figs, [figCosts, figSens, figSuppFigure3, figSuppFigure4]));
 fprintf('All done. Results saved under "%s/".\n\n', RESULTS_DIR);
-
 
 
 
@@ -1012,12 +1036,12 @@ function plotAnnualCostBreakdown_DiscNonDisc_Subplot(ax, results, yLim, yTicks, 
     if exist('yLim','var') && ~isempty(yLim), ylim(ax, yLim); end
     if exist('yTicks','var') && ~isempty(yTicks), yticks(ax, yTicks); end
 
-    ylabel(ax, 'Cost [kEUR]', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+    ylabel(ax, 'Cost [kEUR]', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
     xticks(ax, tickStep * (0:5:20));
     xticklabels(ax, string(0:5:20));
-    xlabel(ax, 'Year', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+    xlabel(ax, 'Year', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
     grid(ax,'on'); box(ax,'on');
-    set(ax, 'FontSize',12, 'TickLabelInterpreter','latex', 'FontName','Latin Modern Roman');
+    set(ax, 'FontSize',7, 'TickLabelInterpreter','tex', 'FontName','Helvetica');
 
     handles = [ ...
         b_cbp(3), b_cbp(1), b_cbp(2), b_cbp(4), b_cbp(5), ...
@@ -1029,7 +1053,7 @@ function plotAnnualCostBreakdown_DiscNonDisc_Subplot(ax, results, yLim, yTicks, 
 
     lgd = safeLegend(ax, handles, labels, ...
         'Orientation','horizontal', 'Location','northeast', ...
-        'FontSize',9, 'Interpreter','latex');
+        'FontSize',7, 'Interpreter','tex');
     lgd.NumColumns    = 5;
     lgd.ItemTokenSize = [10 6];
 
@@ -1044,14 +1068,14 @@ end
 function addPanelLabel(ax, label, offsetX, offsetY, fontSize)
     if nargin < 3 || isempty(offsetX), offsetX = -0.12; end
     if nargin < 4 || isempty(offsetY), offsetY = 1.02;  end
-    if nargin < 5 || isempty(fontSize), fontSize = 12;  end
+    if nargin < 5 || isempty(fontSize), fontSize = 7;  end
 
     text(ax, offsetX, offsetY, label, ...
         'Units', 'normalized', ...
         'FontSize', fontSize, ...
         'FontWeight', 'bold', ...
-        'Interpreter', 'latex', ...
-        'FontName', 'Latin Modern Roman', ...
+        'Interpreter', 'tex', ...
+        'FontName', 'Helvetica', ...
         'HorizontalAlignment', 'left', ...
         'VerticalAlignment', 'top');
 end
@@ -1110,8 +1134,8 @@ function plotCumulativeNPC_DiscNonDisc_Subplot(ax, results, yLabelOn, legendOn, 
     hCBP = plot(ax, x_base, cum_CBP, '-', 'LineWidth', 2, 'Color', col_CBP_light);
     hRBP = plot(ax, x_base, cum_RBP, '-', 'LineWidth', 2, 'Color', col_RBP_light);
 
-    hFinalCBP = plot(ax, x_base(end), cum_CBP(end), '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_CBP);
-    hFinalRBP = plot(ax, x_base(end), cum_RBP(end), '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_RBP);
+    hFinalCBP = plot(ax, x_base(end), cum_CBP(end), '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_CBP);
+    hFinalRBP = plot(ax, x_base(end), cum_RBP(end), '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_RBP);
 
     haveBreakEven = ~isempty(idx_cross) && idx_cross < Y_full;
     if haveBreakEven
@@ -1128,16 +1152,16 @@ function plotCumulativeNPC_DiscNonDisc_Subplot(ax, results, yLabelOn, legendOn, 
     end
 
     if yLabelOn
-        ylabel(ax, 'NPC [kEUR]', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+        ylabel(ax, 'NPC [kEUR]', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
     end
-    xlabel(ax, 'Year', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+    xlabel(ax, 'Year', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
     xlim(ax, tick_spacing*[0 20]);
     xticks(ax, tick_spacing*(0:5:20));
     xticklabels(ax, string(0:5:20));
     if exist('yLim','var') && ~isempty(yLim),   ylim(ax, yLim);   end
     if exist('yTicks','var') && ~isempty(yTicks), yticks(ax, yTicks); end
     grid(ax,'on'); box(ax,'on');
-    set(ax, 'FontSize',12, 'TickLabelInterpreter','latex', 'FontName','Latin Modern Roman');
+    set(ax, 'FontSize',7, 'TickLabelInterpreter','tex', 'FontName','Helvetica');
 
     if legendOn
         legHandles = [hCBP, hRBP, hFinalCBP, hFinalRBP];
@@ -1148,7 +1172,7 @@ function plotCumulativeNPC_DiscNonDisc_Subplot(ax, results, yLabelOn, legendOn, 
         end        
         lgd = safeLegend(ax, legHandles, legLabels, ...
             'Location', legendLocation, ...
-            'Interpreter','latex', 'FontSize',9);
+            'Interpreter','tex', 'FontSize',7);
         lgd.ItemTokenSize = [10, 4];
     end
 
@@ -1158,13 +1182,19 @@ function plotCumulativeNPC_DiscNonDisc_Subplot(ax, results, yLabelOn, legendOn, 
         else
             breakEvenStr = '--';
         end
-        deltaNPCStr = sprintf('%.1f', deltaNPC); 
-        label_text = sprintf('\\textbf{%s } scenario\n\\(\\Delta\\)NPC: %s EUR\nBreak-even: %s years', ...
+    
+        deltaNPCStr = sprintf('%.0f', deltaNPC);
+    
+        label_text = sprintf('\\bf%s\\rm scenario\nΔNPC: %s EUR\nBreak-even: %s years', ...
                              label1, deltaNPCStr, breakEvenStr);
+    
         text(ax, 0.98, 0.02, label_text, ...
-             'Units','normalized', 'Interpreter','latex', ...
-             'FontSize',9, 'HorizontalAlignment','right', ...
-             'VerticalAlignment','bottom', 'FontName','Latin Modern Roman');
+             'Units','normalized', ...
+             'Interpreter','tex', ...
+             'FontSize',7, ...
+             'HorizontalAlignment','right', ...
+             'VerticalAlignment','bottom', ...
+             'FontName','Helvetica');
     end
 
     hold(ax,'off');
@@ -1192,13 +1222,13 @@ function sorted_corrs = tornadoPlotDeltaNPC_Subplot(ax, samples, delta_NPC_kEuro
         end
     end
 
-    factors = {'$Y_{\mathrm{EV}}$', ...
-               '$\Delta\alpha$', ...
-               '$\delta_{\mathrm{loss}}$', ...
-               '$\nu$', ...
-               '$L$', ...
-               '$r$', ...
-               '$E^{\mathrm{nom}}_{\mathrm{pack}}$'};
+    factors = {'Y_{{EV}}', ...
+               '\Delta\alpha', ...
+               '\delta_{{loss}}', ...
+               '\nu', ...
+               'L', ...
+               'r', ...
+               'E_{pack}^{nom}'};  
 
     alpha_diff = samples.alpha_CBP(:) - samples.alpha_RBP(:);
 
@@ -1226,7 +1256,7 @@ function sorted_corrs = tornadoPlotDeltaNPC_Subplot(ax, samples, delta_NPC_kEuro
 
     plot(ax, [0.5, numel(factors_sorted)+0.5], [0 0], '-', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.75);
 
-    ylabel(ax, '$\rho$ [-]', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+    ylabel(ax, '\rho [-]', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
     xticks(ax, x_pos);
     xticklabels(ax, factors_sorted);
     yticks(ax, -1.0:0.5:1.0);
@@ -1234,9 +1264,9 @@ function sorted_corrs = tornadoPlotDeltaNPC_Subplot(ax, samples, delta_NPC_kEuro
     xlim(ax, [0.5, numel(factors_sorted)+0.5]);
 
     grid(ax, 'on'); box(ax, 'on');
-    set(ax, 'FontSize', 12, ...
-            'FontName', 'Latin Modern Roman', ...
-            'TickLabelInterpreter', 'latex', ...
+    set(ax, 'FontSize', 7, ...
+            'FontName', 'Helvetica', ...
+            'TickLabelInterpreter', 'tex', ...
             'LabelFontSizeMultiplier', 1);
 
     for i = 1:numel(corrs_sorted)
@@ -1248,7 +1278,7 @@ function sorted_corrs = tornadoPlotDeltaNPC_Subplot(ax, samples, delta_NPC_kEuro
         end
         text(ax, x_pos(i), val + y_offset, sprintf('%.2f', val), ...
             'HorizontalAlignment','center', 'VerticalAlignment',va, ...
-            'FontSize', 9, 'Interpreter','latex');
+            'FontSize', 7, 'Interpreter','tex');
     end
 
     hold(ax, 'off');
@@ -1277,7 +1307,10 @@ function [x_zero, R_squared, RMSE] = plotSensitivity1D_NoPerc_Subplot(ax, x, y, 
 
     axes(ax); 
     hold(ax, 'on');
-    scatter(ax, x, y, dotSize, col_samples, 'filled');
+    % Plot only a deterministic subset of the sample cloud.
+    % The regression below still uses the full x,y vectors.
+    plotIdx = deterministicPlotSubset(numel(x), 12000, 42);
+    scatter(ax, x(plotIdx), y(plotIdx), dotSize, col_samples, 'filled');
 
     if range(x) < max(1e-9, 1e-6*max(abs(x)))
         x_fit = [min(x) max(x)];
@@ -1320,17 +1353,17 @@ function [x_zero, R_squared, RMSE] = plotSensitivity1D_NoPerc_Subplot(ax, x, y, 
 
     hBest = []; hBase = []; hWorst = [];
     if ib >= 1 && ib <= numel(x)
-        hBest  = plot(ax, x(ib),  y(ib),  '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_best);
+        hBest  = plot(ax, x(ib),  y(ib),  '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_best);
     end
     if ibl >= 1 && ibl <= numel(x)
-        hBase  = plot(ax, x(ibl), y(ibl), '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_baseline);
+        hBase  = plot(ax, x(ibl), y(ibl), '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_baseline);
     end
     if iw >= 1 && iw <= numel(x)
-        hWorst = plot(ax, x(iw),  y(iw),  '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_worst);
+        hWorst = plot(ax, x(iw),  y(iw),  '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_worst);
     end
 
-    xlabel(ax, xLabel, 'Interpreter','latex', 'FontName','Latin Modern Roman');
-    ylabel(ax, '$\Delta \mathrm{NPC}\ [\mathrm{kEUR}]$', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+    xlabel(ax, xLabel, 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
+    ylabel(ax, '\DeltaNPC [kEUR]', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
 
     if isempty(xlims), xlims = [min(x) max(x)]; end
     xlim(ax, xlims);
@@ -1341,8 +1374,8 @@ function [x_zero, R_squared, RMSE] = plotSensitivity1D_NoPerc_Subplot(ax, x, y, 
     if ~isempty(yticks), set(ax, 'YTick', yticks); end
 
     grid(ax, 'on'); box(ax, 'on');
-    set(ax, 'FontSize', 12, 'FontName', 'Latin Modern Roman', ...
-        'TickLabelInterpreter', 'latex', 'LabelFontSizeMultiplier', 1);
+    set(ax, 'FontSize', 7, 'FontName', 'Helvetica', ...
+        'TickLabelInterpreter', 'tex', 'LabelFontSizeMultiplier', 1);
 
     if ~exist('legendLocation','var') || isempty(legendLocation)
         legendLocation = "best";
@@ -1360,7 +1393,7 @@ function [x_zero, R_squared, RMSE] = plotSensitivity1D_NoPerc_Subplot(ax, x, y, 
     if ~isempty(hWorst),     handles(end+1) = hWorst(1);     labels{end+1} = 'Worst';      end
 
     lgd = safeLegend(ax, handles, labels, 'Location', legendLocation, ...
-        'FontSize', 9, 'Interpreter','latex', 'NumColumns', 2);
+        'FontSize', 7, 'Interpreter','tex', 'NumColumns', 2);
     lgd.ItemTokenSize = [10, 4];
 
     hold(ax, 'off');
@@ -1391,7 +1424,10 @@ function [x_zero, R_squared, RMSE] = plot1DWithRegression_Subplot(ax, x, y, xLab
     axes(ax); 
     cla(ax); hold(ax,'on');
 
-    scatter(ax, 100*x, y, dotSize, col_samples, 'filled'); 
+    % Plot only a deterministic subset of the sample cloud.
+    % The regression below still uses the full x,y vectors.
+    plotIdx = deterministicPlotSubset(numel(x), 12000, 43);
+    scatter(ax, 100*x(plotIdx), y(plotIdx), dotSize, col_samples, 'filled'); 
 
     if nearConstX
         x_fit = linspace(min(x), max(x), 2);
@@ -1426,12 +1462,12 @@ function [x_zero, R_squared, RMSE] = plot1DWithRegression_Subplot(ax, x, y, xLab
     iBase = idxAll(idxBaseline);
     iWorst = idxAll(idxWorst);
 
-    if idxBest <= numel(x), plot(ax, 100*x(idxBest), y(idxBest), '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_best);     end
-    if iBase  <= numel(x),  plot(ax, 100*x(iBase),   y(iBase),   '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_baseline); end
-    if iWorst <= numel(x),  plot(ax, 100*x(iWorst),  y(iWorst),  '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_worst);    end
+    if idxBest <= numel(x), plot(ax, 100*x(idxBest), y(idxBest), '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_best);     end
+    if iBase  <= numel(x),  plot(ax, 100*x(iBase),   y(iBase),   '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_baseline); end
+    if iWorst <= numel(x),  plot(ax, 100*x(iWorst),  y(iWorst),  '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_worst);    end
 
-    xlabel(ax, xLabel, 'Interpreter','latex', 'FontName','Latin Modern Roman');
-    ylabel(ax, '$\Delta \mathrm{NPC}\ [\mathrm{kEUR}]$', 'Interpreter','latex', 'FontName','Latin Modern Roman');
+    xlabel(ax, xLabel, 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
+    ylabel(ax, '\DeltaNPC [kEUR]', 'Interpreter','tex', 'FontName','Helvetica','FontSize',7);
 
     if isempty(xlims), xlims = [100*min(x) 100*max(x)]; end
     xlim(ax, xlims);
@@ -1442,11 +1478,11 @@ function [x_zero, R_squared, RMSE] = plot1DWithRegression_Subplot(ax, x, y, xLab
     if ~isempty(yticks), set(ax, 'YTick', yticks); end
 
     grid(ax,'on'); box(ax,'on');
-    set(ax, 'FontSize', 12, 'FontName', 'Latin Modern Roman', ...
-        'TickLabelInterpreter','latex', 'LabelFontSizeMultiplier',1);
+    set(ax, 'FontSize', 7, 'FontName', 'Helvetica', ...
+        'TickLabelInterpreter','tex', 'LabelFontSizeMultiplier',1);
 
     lgd = safeLegend(ax, {'Samples','Best-fit line','Break-even','Best','Baseline','Worst'}, ...
-        'Location','best', 'FontSize',9, 'Interpreter','latex', 'NumColumns',2);
+        'Location','best', 'FontSize',7, 'Interpreter','tex', 'NumColumns',2);
     lgd.ItemTokenSize = [10, 4];
 
     hold(ax,'off');
@@ -1541,30 +1577,56 @@ function [nu_best, L_best] = ...
 
     axes(axRectPlot); cla(axRectPlot); hold(axRectPlot,'on');
 
-    hSucc = scatter(axRectPlot, 100*nu_safe(success),  L_safe(success),  dotSize, col_success, 'filled');
-    hFail = scatter(axRectPlot, 100*nu_safe(~success), L_safe(~success), dotSize, col_fail,    'filled');
+    % Plot only a deterministic subset of the design-space cloud.
+    % The success-threshold rectangle above is still computed from all safe samples.
+    plotIdx = deterministicPlotSubset(numel(nu_safe), 12000, 44);
+    nu_plot      = nu_safe(plotIdx);
+    L_plot       = L_safe(plotIdx);
+    success_plot = success(plotIdx);
 
+    hSucc = scatter(axRectPlot, 100*nu_plot(success_plot),  L_plot(success_plot),  dotSize, col_success, 'filled');
+    hFail = scatter(axRectPlot, 100*nu_plot(~success_plot), L_plot(~success_plot), dotSize, col_fail,    'filled');
+    hRect = gobjects(1);
+    
     if isfinite(nu_best) && isfinite(L_best)
         x_rect = [nu_min, nu_best, nu_best, nu_min, nu_min]*100;
         y_rect = [L_min,  L_min,  L_best,  L_best,  L_min];
-        patch(axRectPlot, 'XData', x_rect, 'YData', y_rect, ...
-            'FaceColor','none','EdgeColor','k','LineWidth',2, 'LineStyle','-');
-    end
+    
+        hRect = patch(axRectPlot, ...
+            'XData', x_rect, ...
+            'YData', y_rect, ...
+            'FaceColor','none', ...
+            'EdgeColor','k', ...
+            'LineWidth',2, ...
+            'LineStyle','-', ...
+            'DisplayName','D');
+    end    
 
-    xlabel(axRectPlot, '$\nu$ [\%]', 'Interpreter','latex');
-    ylabel(axRectPlot, '$L$ [km]', 'Interpreter','latex');
+    xlabel(axRectPlot, '\nu [%]', 'Interpreter','tex','FontSize',7);
+    ylabel(axRectPlot, 'L [km]', 'Interpreter','tex','FontSize',7);
     xlim(axRectPlot, xLim_axRectPlot);
     xticks(axRectPlot, xTicks_axRectPlot);
     ylim(axRectPlot, yLim_axRectPlot);
     yticks(axRectPlot, yTicks_axRectPlot);
     grid(axRectPlot,'on'); box(axRectPlot,'on');
-    set(axRectPlot, 'FontSize',12, 'FontName','Latin Modern Roman', 'TickLabelInterpreter','latex');
+    set(axRectPlot, 'FontSize',7, 'FontName','Helvetica', 'TickLabelInterpreter','tex');
 
-    lgd2 = safeLegend(axRectPlot, [hSucc, hFail], ...
-        {'$\Delta \mathrm{NPC} > 0$','$\Delta \mathrm{NPC} < 0$'}, ...
-        'Interpreter','latex', 'Location','north', ...
-        'Orientation','horizontal','FontSize',9,'NumColumns',2);
-    lgd2.ItemTokenSize = [10,4];
+    legHandles = [hSucc, hFail];
+    legLabels  = {'\DeltaNPC > 0', '\DeltaNPC < 0'};
+    
+    if isgraphics(hRect)
+        legHandles = [legHandles, hRect];
+        legLabels  = [legLabels, {'\bfD\rm'}];
+    end
+    
+    lgd2 = safeLegend(axRectPlot, legHandles, legLabels, ...
+        'Interpreter','tex', ...
+        'Location','north', ...
+        'FontSize',7, ...
+        'NumColumns',2);
+    
+    lgd2.FontName = 'Helvetica';
+    lgd2.ItemTokenSize = [10, 4];    
 
     hold(axRectPlot,'off');
 
@@ -1586,7 +1648,7 @@ function [nu_best, L_best] = ...
     h1 = boxchart(axChemPlot, 0.6*ones(size(dNPC_LFP_feas)), dNPC_LFP_feas, ...
                   'BoxFaceAlpha', 0.5, 'BoxFaceColor', col_LFP,     'HandleVisibility', 'off');
     h2 = boxchart(axChemPlot, 1.4*ones(size(dNPC_LFP_dom)),  dNPC_LFP_dom, ...
-                  'BoxFaceAlpha', 0.5, 'BoxFaceColor', col_LFP_dom, 'HandleVisibility', 'off'); %#ok<NASGU>
+                  'BoxFaceAlpha', 0.5, 'BoxFaceColor', col_LFP_dom, 'HandleVisibility', 'off'); 
     h1.JitterOutliers='on'; h1.MarkerStyle='none';
     h2.JitterOutliers='on'; h2.MarkerStyle='none';
 
@@ -1595,19 +1657,19 @@ function [nu_best, L_best] = ...
     h3 = boxchart(axChemPlot, 2.1*ones(size(dNPC_NMC_feas)), dNPC_NMC_feas, ...
                   'BoxFaceAlpha', 0.5, 'BoxFaceColor', col_NMC,     'HandleVisibility', 'off');
     h4 = boxchart(axChemPlot, 2.9*ones(size(dNPC_NMC_dom)),  dNPC_NMC_dom, ...
-                  'BoxFaceAlpha', 0.5, 'BoxFaceColor', col_NMC_dom, 'HandleVisibility', 'off'); %#ok<NASGU>
+                  'BoxFaceAlpha', 0.5, 'BoxFaceColor', col_NMC_dom, 'HandleVisibility', 'off'); 
     h3.JitterOutliers='on'; h3.MarkerStyle='none';
     h4.JitterOutliers='on'; h4.MarkerStyle='none';
 
-    xlabel(axChemPlot, 'Chemistry', 'Interpreter','latex');
-    ylabel(axChemPlot, '$\Delta \mathrm{NPC}\ [\mathrm{kEUR}]$', 'Interpreter','latex');
+    xlabel(axChemPlot, 'Chemistry', 'Interpreter','tex','FontSize',7);
+    ylabel(axChemPlot, '\DeltaNPC [kEUR]', 'Interpreter','tex','FontSize',7);
     xlim(axChemPlot, [0 3.5]); ylim(axChemPlot, ylims_Main);
     set(axChemPlot, 'YTick', yticks_Main);
     grid(axChemPlot,'on'); box(axChemPlot,'on');
-    lg = safeLegend(axChemPlot, {'LFP','LFP (\textbf{D})','NMC','NMC (\textbf{D})'}, ...
-           'FontSize',9,'Interpreter','latex','Location','north','NumColumns',2);
+    lg = safeLegend(axChemPlot, {'LFP','LFP (\bfD\rm)','NMC','NMC (\bfD\rm)'}, ...
+           'FontSize',7,'Interpreter','tex','Location','north','NumColumns',2);
     lg.ItemTokenSize = [10,4];
-    set(axChemPlot, 'FontSize',12, 'FontName','Latin Modern Roman', 'TickLabelInterpreter','latex');
+    set(axChemPlot, 'FontSize',7, 'FontName','Helvetica', 'TickLabelInterpreter','tex');
     set(axChemPlot, 'XTick', []);
 
     if ~isempty(dNPC_LFP_dom)
@@ -1615,9 +1677,9 @@ function [nu_best, L_best] = ...
         edgeColor   = col_LFP_dom;
         bgColor     = edgeColor + (1 - edgeColor)*0.5;
         text(axChemPlot, 1.4-0.02, ylims_Main(1) + 0.18*range(ylims_Main), ...
-            sprintf('Median:\n%.1f EUR', med_LFP_dom*1000), ...
+            sprintf('Median:\n%.0f EUR', med_LFP_dom*1000), ...
             'HorizontalAlignment','center','VerticalAlignment','top', ...
-            'FontSize',9,'Color','black','Interpreter','latex', ...
+            'FontSize',7,'Color','black','Interpreter','tex', ...
             'EdgeColor',edgeColor,'BackgroundColor',bgColor,'Margin',1);
     end
     if ~isempty(dNPC_NMC_dom)
@@ -1625,9 +1687,9 @@ function [nu_best, L_best] = ...
         edgeColor   = col_NMC_dom;
         bgColor     = edgeColor + (1 - edgeColor)*0.5;
         text(axChemPlot, 2.9-0.02, ylims_Main(1) + 0.18*range(ylims_Main), ...
-            sprintf('Median:\n%.1f EUR', med_NMC_dom*1000), ...
+            sprintf('Median:\n%.0f EUR', med_NMC_dom*1000), ...
             'HorizontalAlignment','center','VerticalAlignment','top', ...
-            'FontSize',9,'Color','black','Interpreter','latex', ...
+            'FontSize',7,'Color','black','Interpreter','tex', ...
             'EdgeColor',edgeColor,'BackgroundColor',bgColor,'Margin',1);
     end
 
@@ -1640,9 +1702,22 @@ end
 % SCATTERPOINTS_SUBPLOT
 % -------------------------------------------------------------------------
 function scatterPoints_subplot(ax, xpos, ydata, color, jitter)
-    axes(ax);  
-    xj = xpos + (rand(size(ydata)) - 0.5) * jitter;  
-    scatter(ax, xj, ydata, 25, color, 'filled', 'MarkerFaceAlpha', 0.7);
+    axes(ax);
+
+    % The chemistry panel can contain tens of thousands of points per group.
+    % Draw a deterministic subset only; the boxchart and medians are still
+    % computed from the full ydata vectors by the caller.
+    ydata = ydata(:);
+    plotIdx = deterministicPlotSubset(numel(ydata), 2500, 45 + round(100*xpos));
+    yplot = ydata(plotIdx);
+
+    % Make the jitter reproducible without disturbing the caller's RNG state.
+    rngState = rng;
+    cleanupObj = onCleanup(@() rng(rngState)); 
+    rng(1000 + round(100*xpos));
+
+    xj = xpos + (rand(size(yplot)) - 0.5) * jitter;
+    scatter(ax, xj, yplot, 8, color, 'filled');
 end
 
 
@@ -1702,14 +1777,16 @@ function plotSensitivity1D_Subplot(ax, x, y, xLabel, xlims, xticks, ylims, ytick
     axes(ax);
     hold(ax, 'on');
 
-    scatter(ax, 100*x, y, dotSize, col_samples, 'filled');
+    % Plot only a deterministic subset of the sample cloud.
+    plotIdx = deterministicPlotSubset(numel(x), 12000, 46);
+    scatter(ax, 100*x(plotIdx), y(plotIdx), dotSize, col_samples, 'filled');
 
-    plot(ax, 100*x(idxBest),     y(idxBest),     '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_best);
-    plot(ax, 100*x(idxBaseline), y(idxBaseline), '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_baseline);
-    plot(ax, 100*x(idxWorst),    y(idxWorst),    '*', 'MarkerSize', 10, 'LineWidth', 2, 'Color', col_worst);
+    plot(ax, 100*x(idxBest),     y(idxBest),     '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_best);
+    plot(ax, 100*x(idxBaseline), y(idxBaseline), '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_baseline);
+    plot(ax, 100*x(idxWorst),    y(idxWorst),    '*', 'MarkerSize', 10, 'LineWidth', 1, 'Color', col_worst);
 
-    xlabel(ax, xLabel, 'Interpreter','latex', 'FontName', 'Latin Modern Roman');
-    ylabel(ax, '$\Delta \mathrm{NPC}\ [\mathrm{kEUR}]$', 'Interpreter','latex', 'FontName', 'Latin Modern Roman');
+    xlabel(ax, xLabel, 'Interpreter','tex', 'FontName', 'Helvetica','FontSize',7);
+    ylabel(ax, '\DeltaNPC [kEUR]', 'Interpreter','tex', 'FontName', 'Helvetica','FontSize',7);
 
     if isempty(xlims)
         xlims = [min(x), max(x)];
@@ -1726,11 +1803,11 @@ function plotSensitivity1D_Subplot(ax, x, y, xLabel, xlims, xticks, ylims, ytick
     grid(ax, 'on');
     box(ax, 'on');
 
-    set(ax, 'FontSize', 12, 'FontName', 'Latin Modern Roman', ...
-        'TickLabelInterpreter', 'latex', ...
+    set(ax, 'FontSize', 7, 'FontName', 'Helvetica', ...
+        'TickLabelInterpreter', 'tex', ...
         'LabelFontSizeMultiplier', 1);
     lgd1 = safeLegend(ax, {'Samples', 'Best', 'Baseline', 'Worst'}, ...
-        'Location', 'best', 'FontSize', 9, 'Interpreter', 'latex', 'NumColumns', 2);
+        'Location', 'best', 'FontSize', 7, 'Interpreter', 'tex', 'NumColumns', 2);
     lgd1.ItemTokenSize = [10, 4];        
 
     hold(ax, 'off');
@@ -1739,51 +1816,37 @@ end
 
 
 % -------------------------------------------------------------------------
-% FAST COARSE SEARCH HELPER
+% DETERMINISTICPLOTSUBSET
 % -------------------------------------------------------------------------
-% function [x_star, y_star, success_rate_star] = dominantRectFast(x, y, is_success, bounds, nBins, thresh)
-%     x_min = bounds(1,1); x_max = bounds(1,2);
-%     y_min = bounds(2,1); y_max = bounds(2,2);
-%     nx = nBins(1); ny = nBins(2);
-% 
-%     ok = isfinite(x) & isfinite(y) & ...
-%          x>=x_min & x<=x_max & y>=y_min & y<=y_max;
-%     x = x(ok); y = y(ok); is_success = is_success(ok);
-% 
-%     if isempty(x)
-%         x_star = NaN; y_star = NaN; success_rate_star = NaN; return;
-%     end
-% 
-%     xe = linspace(x_min, x_max, nx+1);
-%     ye = linspace(y_min, y_max, ny+1);
-%     ix = discretize(x, xe); ix(isnan(ix)) = 1; ix(ix<1)=1; ix(ix>nx)=nx;
-%     iy = discretize(y, ye); iy(isnan(iy)) = 1; iy(iy<1)=1; iy(iy>ny)=ny;
-% 
-%     Hcnt = accumarray([ix iy], 1, [nx ny], @sum, 0);
-%     Hsuc = accumarray([ix iy], double(is_success), [nx ny], @sum, 0);
-% 
-%     Ccnt = cumsum(cumsum(Hcnt,1),2);
-%     Csuc = cumsum(cumsum(Hsuc,1),2);
-% 
-%     rate = Csuc ./ max(Ccnt, 1);             
-%     area = ( (1:nx)'/nx ) * ( (1:ny)/ny );   
-%     area(rate < thresh) = -Inf;
-% 
-%     [maxArea, lin] = max(area(:)); %#ok<ASGLU>
-%     if ~isfinite(maxArea)
-%         x_star = NaN; y_star = NaN; success_rate_star = NaN; return;
-%     end
-%     [iStar, jStar] = ind2sub(size(area), lin);
-% 
-%     x_star = xe(iStar+1);
-%     y_star = ye(jStar+1);
-%     success_rate_star = rate(iStar, jStar);
-% end
+function idx = deterministicPlotSubset(n, maxN, seed)
+    % Return indices for a deterministic visual-only subset.
+    % This helper is used only to reduce vector-PDF object count; it must not
+    % be used for statistics, regressions, medians, or rectangle selection.
+    if nargin < 3 || isempty(seed)
+        seed = 42;
+    end
+
+    if n <= 0
+        idx = zeros(0,1);
+        return
+    end
+
+    if n <= maxN
+        idx = (1:n).';
+        return
+    end
+
+    rngState = rng;
+    cleanupObj = onCleanup(@() rng(rngState));
+
+    rng(seed);
+    idx = sort(randperm(n, maxN)).';
+end
 
 
 
 % -------------------------------------------------------------------------
-% safeLegend — always call the built-in legend, even if a variable named "legend" exists
+% safeLegend
 % -------------------------------------------------------------------------
 function lgd = safeLegend(axOrHandles, varargin)
 % Usage patterns mirrored:
@@ -1815,154 +1878,191 @@ function [x_best, y_best, success_rate_best, rectEdges, altRectEdges, ...
     xVarName, yVarName, xAxisInPerc, yAxisInPerc, ...
     xLabel, yLabel, altSuccessThreshold, plotAltCriterion)
 
-% Validate axes
-if ~ishandle(axRect) || ~strcmp(get(axRect,'Type'),'axes')
-    error('plotDominantRectangle2DOnly:InvalidAxes','axRect must be a valid axes handle.');
-end
-
-% Defaults
-if nargin < 5 || isempty(feasible), feasible = true(numel(samples.(xVarName)),1); end
-if nargin < 15 || isempty(altSuccessThreshold), altSuccessThreshold = 0.95; end
-if nargin < 16 || isempty(plotAltCriterion),     plotAltCriterion     = false;  end
-
-% Extract variables
-xVar = samples.(xVarName)(:);
-yVar = samples.(yVarName)(:);
-succAll = delta_NPC(:) > 0;
-if ~isvector(feasible), feasible = feasible(:); end
-
-% Bounds & feasible subset
-x_bounds = rect_bounds(1,:);  y_bounds = rect_bounds(2,:);
-x_min = x_bounds(1); x_max = x_bounds(2); x_rng = max(eps, x_max - x_min);
-y_min = y_bounds(1); y_max = y_bounds(2); y_rng = max(eps, y_max - y_min);
-
-in = feasible & xVar>=x_min & xVar<=x_max & yVar>=y_min & yVar<=y_max;
-x = xVar(in); y = yVar(in); succ = succAll(in);
-
-% Defaults for empty case
-x_best = NaN; y_best = NaN; success_rate_best = NaN;
-rectEdges = struct('x_min',NaN,'x_max',NaN,'y_min',NaN,'y_max',NaN, ...
-                   'success_rate',NaN,'area_norm',NaN,'grid_x_norm',NaN,'grid_y_norm',NaN);
-altRectEdges = rectEdges;
-x_best_alt = NaN; y_best_alt = NaN; success_rate_alt = NaN;
-
-% Early out if nothing usable
-if isempty(x)
-    axes(axRect); cla(axRect); box(axRect,'on'); grid(axRect,'on');
-    xlabel(axRect, xLabel, 'Interpreter','latex'); ylabel(axRect, yLabel, 'Interpreter','latex');
+    % Validate axes
+    if ~ishandle(axRect) || ~strcmp(get(axRect,'Type'),'axes')
+        error('plotDominantRectangle2DOnly:InvalidAxes','axRect must be a valid axes handle.');
+    end
+    
+    % Defaults
+    if nargin < 5 || isempty(feasible), feasible = true(numel(samples.(xVarName)),1); end
+    if nargin < 15 || isempty(altSuccessThreshold), altSuccessThreshold = 0.95; end
+    if nargin < 16 || isempty(plotAltCriterion),     plotAltCriterion     = false;  end
+    
+    % Extract variables
+    xVar = samples.(xVarName)(:);
+    yVar = samples.(yVarName)(:);
+    succAll = delta_NPC(:) > 0;
+    if ~isvector(feasible), feasible = feasible(:); end
+    
+    % Bounds & feasible subset
+    x_bounds = rect_bounds(1,:);  y_bounds = rect_bounds(2,:);
+    x_min = x_bounds(1); x_max = x_bounds(2); x_rng = max(eps, x_max - x_min);
+    y_min = y_bounds(1); y_max = y_bounds(2); y_rng = max(eps, y_max - y_min);
+    
+    in = feasible & xVar>=x_min & xVar<=x_max & yVar>=y_min & yVar<=y_max;
+    x = xVar(in); y = yVar(in); succ = succAll(in);
+    
+    % Defaults for empty case
+    x_best = NaN; y_best = NaN; success_rate_best = NaN;
+    rectEdges = struct('x_min',NaN,'x_max',NaN,'y_min',NaN,'y_max',NaN, ...
+                       'success_rate',NaN,'area_norm',NaN,'grid_x_norm',NaN,'grid_y_norm',NaN);
+    altRectEdges = rectEdges;
+    x_best_alt = NaN; y_best_alt = NaN; success_rate_alt = NaN;
+    
+    % Early out if nothing usable
+    if isempty(x)
+        axes(axRect); cla(axRect); box(axRect,'on'); grid(axRect,'on');
+        xlabel(axRect, xLabel, 'Interpreter','tex','FontSize',7,'FontName','Helvetica'); 
+        ylabel(axRect, yLabel, 'Interpreter','tex','FontSize',7,'FontName','Helvetica');
+        xlim(axRect, xlims); if ~isempty(xticks), set(axRect,'XTick',xticks); end
+        ylim(axRect, ylims); if ~isempty(yticks), set(axRect,'YTick',yticks); end
+        set(axRect,'FontSize',7,'TickLabelInterpreter','tex','FontName','Helvetica');
+        return
+    end
+    
+    % Normalize to [0,1]
+    xn = (x - x_min)/x_rng; xn = min(max(xn,0),1);
+    yn = (y - y_min)/y_rng; yn = min(max(yn,0),1);
+    
+    % Bin into BxB grid
+    B = 100;                             % tune for speed/precision
+    edges = linspace(0,1,B+1);
+    ix = discretize(xn, edges); ix(isnan(ix)) = B;
+    iy = discretize(yn, edges); iy(isnan(iy)) = B;
+    
+    H  = accumarray([ix,iy], 1,     [B B], @sum, 0, true);  % counts
+    Hs = accumarray([ix,iy], double(succ),  [B B], @sum, 0, true);  % successes
+    
+    % 2D cumulative sums (integral images)
+    Cum  = cumsum(cumsum(H ,1),2);
+    CumS = cumsum(cumsum(Hs,1),2);
+    
+    valid = Cum > 0;
+    SuccRate = zeros(B,B);
+    SuccRate(valid) = CumS(valid) ./ Cum(valid);
+    
+    % Rectangle area in normalized units using right/top grid edges
+    gx = edges(2:end); gy = gx;
+    Area = (gx(:) * gy(:).');   % BxB
+    
+    % ---------- Main criterion ----------
+    mask = SuccRate >= successThreshold & valid;
+    if any(mask(:))
+        [~, rel] = max(Area(mask)); idxs = find(mask); bestLin = idxs(rel);
+    else
+        [~, bestLin] = max(SuccRate(:) + 1e-12*Area(:));  % fallback: best rate then area
+    end
+    [i_best, j_best] = ind2sub([B B], bestLin);
+    
+    x_best = x_min + gx(i_best) * x_rng;
+    y_best = y_min + gy(j_best) * y_rng;
+    success_rate_best = SuccRate(i_best, j_best);
+    
+    rectEdges = struct( ...
+        'x_min', x_min, 'x_max', x_best, ...
+        'y_min', y_min, 'y_max', y_best, ...
+        'success_rate', success_rate_best, ...
+        'area_norm', Area(i_best,j_best), ...
+        'grid_x_norm', gx(i_best), 'grid_y_norm', gy(j_best));
+    
+    % ---------- Alternative criterion ----------
+    if plotAltCriterion
+        maskAlt = SuccRate >= altSuccessThreshold & valid;
+        if any(maskAlt(:))
+            [~, relA] = max(Area(maskAlt)); idxsA = find(maskAlt); linAlt = idxsA(relA);
+            [ia, ja] = ind2sub([B B], linAlt);
+    
+            x_best_alt = x_min + gx(ia) * x_rng;
+            y_best_alt = y_min + gy(ja) * y_rng;
+            success_rate_alt = SuccRate(ia, ja);
+    
+            altRectEdges = struct( ...
+                'x_min', x_min, 'x_max', x_best_alt, ...
+                'y_min', y_min, 'y_max', y_best_alt, ...
+                'success_rate', success_rate_alt, ...
+                'area_norm', Area(ia,ja), ...
+                'grid_x_norm', gx(ia), 'grid_y_norm', gy(ja));
+        end
+    end
+    
+    % ---------- Plot ----------
+    axes(axRect); cla(axRect); hold(axRect,'on');
+    xplot = @(v) v; yplot = @(v) v;
+    if xAxisInPerc, xplot = @(v) 100*v; end
+    if yAxisInPerc, yplot = @(v) 100*v; end
+    
+    % Colour-blind-safe palette following Wong (2011, Nature Methods).
+    % Success: sky blue; failure: vermillion. No red used.
+    col_succ = [86,  180, 233] / 255;   % WongSkyBlue
+    col_fail = [213,  94,   0] / 255;   % WongVermillion
+    
+    % Plot only a deterministic subset of the rectangle-design cloud.
+    % Rectangle estimation above still uses all x,y,succ values.
+    plotIdx = deterministicPlotSubset(numel(x), 12000, 47);
+    x_plot = x(plotIdx);
+    y_plot = y(plotIdx);
+    succ_plot = succ(plotIdx);
+    
+    hSucc = scatter(axRect, xplot(x_plot(succ_plot)),   yplot(y_plot(succ_plot)),   dotSize, col_succ, 'filled', 'DisplayName', 'ΔNPC > 0');
+    hFail = scatter(axRect, xplot(x_plot(~succ_plot)),  yplot(y_plot(~succ_plot)),  dotSize, col_fail, 'filled', 'DisplayName', 'ΔNPC < 0');
+    
+    % Main rectangle
+    x_rect = [x_min, rectEdges.x_max, rectEdges.x_max, x_min, x_min];
+    y_rect = [y_min, y_min,          rectEdges.y_max, rectEdges.y_max, y_min];
+    if xAxisInPerc, x_rect = 100*x_rect; end
+    if yAxisInPerc, y_rect = 100*y_rect; end
+    
+    hD1 = patch(axRect, ...
+        'XData', x_rect, ...
+        'YData', y_rect, ...
+        'FaceColor','none', ...
+        'EdgeColor','k', ...
+        'LineWidth',2.0, ...
+        'LineStyle','-', ...
+        'DisplayName','D1');
+    
+    % Alternative rectangle: D2
+    hD2 = gobjects(1);
+    
+    if plotAltCriterion && isfinite(x_best_alt)
+        xr2 = [x_min, altRectEdges.x_max, altRectEdges.x_max, x_min, x_min];
+        yr2 = [y_min, y_min,             altRectEdges.y_max,  altRectEdges.y_max, y_min];
+    
+        if xAxisInPerc, xr2 = 100*xr2; end
+        if yAxisInPerc, yr2 = 100*yr2; end
+    
+        hD2 = patch(axRect, ...
+            'XData', xr2, ...
+            'YData', yr2, ...
+            'FaceColor','none', ...
+            'EdgeColor',[0.35 0.35 0.35], ...
+            'LineStyle','--', ...
+            'LineWidth',1.5, ...
+            'DisplayName','D2');
+    end
+    
+    xlabel(axRect, xLabel, 'Interpreter','tex','FontSize',7, 'FontName','Helvetica');
+    ylabel(axRect, yLabel, 'Interpreter','tex','FontSize',7, 'FontName','Helvetica');
     xlim(axRect, xlims); if ~isempty(xticks), set(axRect,'XTick',xticks); end
     ylim(axRect, ylims); if ~isempty(yticks), set(axRect,'YTick',yticks); end
-    set(axRect,'FontSize',12,'TickLabelInterpreter','latex','FontName','Latin Modern Roman');
-    return
-end
-
-% Normalize to [0,1]
-xn = (x - x_min)/x_rng; xn = min(max(xn,0),1);
-yn = (y - y_min)/y_rng; yn = min(max(yn,0),1);
-
-% Bin into BxB grid
-B = 100;                             % tune for speed/precision
-edges = linspace(0,1,B+1);
-ix = discretize(xn, edges); ix(isnan(ix)) = B;
-iy = discretize(yn, edges); iy(isnan(iy)) = B;
-
-H  = accumarray([ix,iy], 1,     [B B], @sum, 0, true);  % counts
-Hs = accumarray([ix,iy], double(succ),  [B B], @sum, 0, true);  % successes
-
-% 2D cumulative sums (integral images)
-Cum  = cumsum(cumsum(H ,1),2);
-CumS = cumsum(cumsum(Hs,1),2);
-
-valid = Cum > 0;
-SuccRate = zeros(B,B);
-SuccRate(valid) = CumS(valid) ./ Cum(valid);
-
-% Rectangle area in normalized units using right/top grid edges
-gx = edges(2:end); gy = gx;
-Area = (gx(:) * gy(:).');   % BxB
-
-% ---------- Main criterion ----------
-mask = SuccRate >= successThreshold & valid;
-if any(mask(:))
-    [~, rel] = max(Area(mask)); idxs = find(mask); bestLin = idxs(rel);
-else
-    [~, bestLin] = max(SuccRate(:) + 1e-12*Area(:));  % fallback: best rate then area
-end
-[i_best, j_best] = ind2sub([B B], bestLin);
-
-x_best = x_min + gx(i_best) * x_rng;
-y_best = y_min + gy(j_best) * y_rng;
-success_rate_best = SuccRate(i_best, j_best);
-
-rectEdges = struct( ...
-    'x_min', x_min, 'x_max', x_best, ...
-    'y_min', y_min, 'y_max', y_best, ...
-    'success_rate', success_rate_best, ...
-    'area_norm', Area(i_best,j_best), ...
-    'grid_x_norm', gx(i_best), 'grid_y_norm', gy(j_best));
-
-% ---------- Alternative criterion ----------
-if plotAltCriterion
-    maskAlt = SuccRate >= altSuccessThreshold & valid;
-    if any(maskAlt(:))
-        [~, relA] = max(Area(maskAlt)); idxsA = find(maskAlt); linAlt = idxsA(relA);
-        [ia, ja] = ind2sub([B B], linAlt);
-
-        x_best_alt = x_min + gx(ia) * x_rng;
-        y_best_alt = y_min + gy(ja) * y_rng;
-        success_rate_alt = SuccRate(ia, ja);
-
-        altRectEdges = struct( ...
-            'x_min', x_min, 'x_max', x_best_alt, ...
-            'y_min', y_min, 'y_max', y_best_alt, ...
-            'success_rate', success_rate_alt, ...
-            'area_norm', Area(ia,ja), ...
-            'grid_x_norm', gx(ia), 'grid_y_norm', gy(ja));
+    grid(axRect,'on'); box(axRect,'on');
+    set(axRect,'FontSize',7,'TickLabelInterpreter','tex','FontName','Helvetica');
+    
+    legHandles = [hSucc, hFail, hD1];
+    legLabels  = {'ΔNPC > 0', 'ΔNPC < 0', 'D1'};
+    
+    if isgraphics(hD2)
+        legHandles = [legHandles, hD2];
+        legLabels  = [legLabels, {'D2'}];
     end
-end
-
-% ---------- Plot ----------
-axes(axRect); cla(axRect); hold(axRect,'on');
-xplot = @(v) v; yplot = @(v) v;
-if xAxisInPerc, xplot = @(v) 100*v; end
-if yAxisInPerc, yplot = @(v) 100*v; end
-
-% Colour-blind-safe palette following Wong (2011, Nature Methods).
-% Success: sky blue; failure: vermillion. No red used.
-col_succ = [86,  180, 233] / 255;   % WongSkyBlue
-col_fail = [213,  94,   0] / 255;   % WongVermillion
-
-hSucc = scatter(axRect, xplot(x(succ)),   yplot(y(succ)),   dotSize, col_succ, 'filled', 'DisplayName', '$\Delta \mathrm{NPC} > 0$');
-hFail = scatter(axRect, xplot(x(~succ)),  yplot(y(~succ)),  dotSize, col_fail, 'filled', 'DisplayName', '$\Delta \mathrm{NPC} < 0$');
-
-% Main rectangle
-x_rect = [x_min, rectEdges.x_max, rectEdges.x_max, x_min, x_min];
-y_rect = [y_min, y_min,          rectEdges.y_max, rectEdges.y_max, y_min];
-if xAxisInPerc, x_rect = 100*x_rect; end
-if yAxisInPerc, y_rect = 100*y_rect; end
-patch(axRect, 'XData', x_rect, 'YData', y_rect, 'FaceColor','none','EdgeColor','k','LineWidth',2);
-
-% Alt rectangle (optional)
-if plotAltCriterion && isfinite(x_best_alt)
-    xr2 = [x_min, altRectEdges.x_max, altRectEdges.x_max, x_min, x_min];
-    yr2 = [y_min, y_min,             altRectEdges.y_max,  altRectEdges.y_max, y_min];
-    if xAxisInPerc, xr2 = 100*xr2; end
-    if yAxisInPerc, yr2 = 100*yr2; end
-    patch(axRect, 'XData', xr2, 'YData', yr2, 'FaceColor','none','EdgeColor',[0.3 0.3 0.3], 'LineStyle','--', 'LineWidth',1.5);
-end
-
-xlabel(axRect, xLabel, 'Interpreter','latex');
-ylabel(axRect, yLabel, 'Interpreter','latex');
-xlim(axRect, xlims); if ~isempty(xticks), set(axRect,'XTick',xticks); end
-ylim(axRect, ylims); if ~isempty(yticks), set(axRect,'YTick',yticks); end
-grid(axRect,'on'); box(axRect,'on');
-set(axRect,'FontSize',12,'TickLabelInterpreter','latex','FontName','Latin Modern Roman');
-
-lgd = safeLegend(axRect, [hSucc, hFail], ...
-    {'$\Delta \mathrm{NPC} > 0$','$\Delta \mathrm{NPC} < 0$'}, ...
-    'Interpreter','latex', 'Location','north', ...
-    'Orientation','horizontal','FontSize',9,'NumColumns',2);
-lgd.ItemTokenSize = [10,4];
-
-hold(axRect,'off');
+    lgd = safeLegend(axRect, legHandles, legLabels, ...
+        'Interpreter','tex', ...
+        'Location','north', ...
+        'FontSize',7, ...
+        'NumColumns',2);
+    
+    lgd.FontName = 'Helvetica';
+    lgd.ItemTokenSize = [12, 6];
+    
+    hold(axRect,'off');
 end

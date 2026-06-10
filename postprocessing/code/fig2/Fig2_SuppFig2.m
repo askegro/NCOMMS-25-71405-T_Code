@@ -7,7 +7,7 @@ close all; clc;
 %% ===== Code Ocean / portable paths setup =====
 ROOT_DIR = fileparts(CODE_DIR); %fileparts(fileparts(CODE_DIR));
 DATA_DIR = fullfile(ROOT_DIR, 'data');
-RESULTS_DIR = fullfile(ROOT_DIR, 'results', 'fig3'); 
+RESULTS_DIR = fullfile(ROOT_DIR, 'results', 'fig2'); 
 if (~isfolder(RESULTS_DIR))
     mkdir(RESULTS_DIR); 
 end
@@ -26,22 +26,23 @@ load(matPath, 'resultsEFC_2025_06');   % expects the table variable to exist
 
 
 % === Output targets ===
-OUT_PDF_MAIN   = fullfile(RESULTS_DIR, 'Figure_3_pdfformat.pdf');
-OUT_FIG_MAIN   = fullfile(RESULTS_DIR, 'Figure_3_figformat.fig');
-OUT_PDF_SUPP   = fullfile(RESULTS_DIR, 'Supplementary_Figure_1_pdfformat.pdf');
-OUT_FIG_SUPP   = fullfile(RESULTS_DIR, 'Supplementary_Figure_1_figformat.fig');
+OUT_PDF_MAIN   = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_2.pdf');
+OUT_FIG_MAIN   = fullfile(RESULTS_DIR, 'J1_NatComm_Figure_2.fig');
+OUT_PDF_SUPP   = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_2.pdf');
+OUT_FIG_SUPP   = fullfile(RESULTS_DIR, 'J1_NatComm_SuppFigure_2.fig');
 
 
 
 %% ===== Global graphics defaults =====
-set(0, 'DefaultAxesFontName', 'Times');
-set(0, 'DefaultTextFontName', 'Times');
-set(0, 'DefaultAxesFontSize', 11);
+set(0, 'DefaultAxesFontName', 'Helvetica');
+set(0, 'DefaultTextFontName', 'Helvetica');
+set(0, 'DefaultAxesFontSize', 7);
 set(0, 'DefaultTextInterpreter', 'latex');
 set(0, 'DefaultAxesTickLabelInterpreter', 'latex');
 
 % Per-figure normalization (if exporting single figs)
-STD_W = 1100; STD_H = 850;
+STD_W = 1100; 
+STD_H = 850;
 DO_INDIVIDUAL_EXPORT = false;
 
 % Uniform grid look
@@ -57,20 +58,20 @@ reqVars = ["Chemistry","TC","Ns","Temp","Tsig","Trest","meanEFC","stdEFC"];
 assert(all(ismember(reqVars, string(data.Properties.VariableNames))), ...
        'Data table missing one or more required columns.');
 
-% Normalize if needed
+% Normalize
 data.Tsig  = data.Tsig  / 100;
 data.Trest = data.Trest / 100;
 
 
 
-% Split by chemistry and TC — assuming data is already cleaned & TC is final
+% Split by chemistry and TC, assuming data is already cleaned & TC is final
 rows_LFP = matches(string(data.Chemistry), ["CHEM_1","LFP"]);
 rows_NMC = matches(string(data.Chemistry), ["CHEM_2","NMC"]);
 
 LFP = data(rows_LFP, :);
 NMC = data(rows_NMC, :);
 
-% No remapping needed — just split by TC = 1 and 2
+% No remapping needed, just split by TC = 1 and 2
 LFP_TC1 = LFP(LFP.TC == 1, :);
 LFP_TC2 = LFP(LFP.TC == 2, :);
 
@@ -160,13 +161,14 @@ figs_7_to_10 = [ ...
 
 %% --------- Build exact A4 composites with precise manual layout ---------
 % Exact A4 (cm)
-A4w = 21.0; A4h = 29.7;
+A4w = 21.0; 
+A4h = 29.7;
 targetMonitor = 2;
 
-fig3  = exportCombinedGridA4Exact(figs_1_to_6, [3,2], OUT_PDF_MAIN, OUT_FIG_MAIN, A4w, A4h, targetMonitor, GRID_COLOR, GRID_ALPHA);
-fprintf('Figure 3 exported.\n');
-supp1 = exportCombinedGridA4Exact(figs_7_to_10, [2,2], OUT_PDF_SUPP, OUT_FIG_SUPP, A4w, A4h, targetMonitor, GRID_COLOR, GRID_ALPHA);
-fprintf('Supplementary Figure 1 exported.\n');
+fig2  = exportCombinedGridA4Exact(figs_1_to_6, [3,2], OUT_PDF_MAIN, OUT_FIG_MAIN, A4w, A4h, targetMonitor, GRID_COLOR, GRID_ALPHA);
+fprintf('Figure 2 exported.\n');
+suppfig2 = exportCombinedGridA4Exact(figs_7_to_10, [2,2], OUT_PDF_SUPP, OUT_FIG_SUPP, A4w, A4h, targetMonitor, GRID_COLOR, GRID_ALPHA);
+fprintf('Supplementary Figure 2 exported.\n');
 
 fprintf('All done. Results saved under "%s/".\n\n', RESULTS_DIR);
 
@@ -187,7 +189,6 @@ function finalizeExport(fig, base, outDir, STD_W, STD_H, doExport)
     normalizeFigureForExport(fig, STD_W, STD_H);
     if ~doExport, return; end
     exportgraphics(fig, fullfile(outDir, base + ".pdf"), 'ContentType','vector');
-    %print(fig, fullfile(outDir, base + ".eps"), '-depsc2');
 end
 
 
@@ -212,7 +213,7 @@ function fig = plot_TCSensitivity_trueX(data_all, Outputs, OutputLabels, Chem, o
 
     base_height = 380; fig_height = 120 + base_height * numel(Outputs);
     fig = figure('Color','w','Visible','off','Position',[200,120,900,fig_height]); 
-    t = tiledlayout(numel(Outputs),1,"TileSpacing","compact","Padding","compact");
+    tiledlayout(numel(Outputs),1,"TileSpacing","compact","Padding","compact");
 
     x_min = min(pred_vals); x_max = max(pred_vals);
     x_rng = max(x_max - x_min, eps);
@@ -251,7 +252,7 @@ function fig = plot_TCSensitivity_trueX(data_all, Outputs, OutputLabels, Chem, o
             yText = wHigh + 0.02*spread;
             % smaller median tile
             txt = text(val,yText,sprintf('%.2f',q2),'HorizontalAlignment','center', ...
-                'VerticalAlignment','bottom','FontSize',8,'FontWeight','bold', ...
+                'VerticalAlignment','bottom','FontSize',6,'FontWeight','bold', ...
                 'Interpreter','latex','Color',redCol,'Margin',0.5, ...
                 'BackgroundColor',labelBG,'EdgeColor',labelEdge,'LineWidth',0.4,'Clipping','off');
             set(txt,'Units','data'); ext = get(txt,'Extent');
@@ -262,7 +263,7 @@ function fig = plot_TCSensitivity_trueX(data_all, Outputs, OutputLabels, Chem, o
         ax.GridAlpha = GRID_ALPHA; ax.GridColor = GRID_COLOR;
         set(ax,'XTick',pred_vals,'XTickLabel',xLabels,'TickLabelInterpreter','latex');
         xlim(ax,[x_min - x_pad, x_max + x_pad]);
-        ylabel(yLabel,'FontSize',11,'Interpreter','latex');
+        ylabel(yLabel,'FontSize',7,'Interpreter','latex');
         ax.Box = 'on'; ax.Layer='top';
 
         % --- FORCE Y-LIMITS per figure set ---
@@ -329,7 +330,7 @@ function figs = plot_ParameterSensitivity_trueX(data_all, Parameters, Outputs, .
         if isKey(widthMap, xName), w = widthMap(xName)*xRange; else, w = 0.03*xRange; end
 
         fig = figure('Color','w','Visible','off','Position',[200 150 900 800]); 
-        t = tiledlayout(numel(Outputs),1,'TileSpacing','compact','Padding','compact');
+        tiledlayout(numel(Outputs),1,'TileSpacing','compact','Padding','compact');
 
         for j = 1:numel(Outputs)
             ax = nexttile; hold(ax,'on');
@@ -368,9 +369,9 @@ function figs = plot_ParameterSensitivity_trueX(data_all, Parameters, Outputs, .
 
                 % Smaller median tile
                 txt = text(xi,yText,sprintf('%.2f',q2),'HorizontalAlignment','center', ...
-                    'VerticalAlignment',vAlign,'FontSize',8,'FontWeight','bold', ...
+                    'VerticalAlignment',vAlign,'FontSize',6,'FontWeight','bold', ...
                     'Interpreter','latex','Color',redCol,'Margin',0.5, ...
-                    'BackgroundColor',labelBGCol,'EdgeColor',labelEdgeCol,'LineWidth',0.4,'Clipping','off');
+                    'BackgroundColor',labelBGCol,'EdgeColor',labelEdgeCol,'LineWidth',0.4,'Clipping','off');              
                 set(txt,'Units','data'); ext=get(txt,'Extent');
 
                 labelTopAll(end+1)    = ext(2)+ext(4);  %#ok<AGROW>
@@ -401,7 +402,8 @@ function figs = plot_ParameterSensitivity_trueX(data_all, Parameters, Outputs, .
                 xlim(ax,[xMin - 3*w, xMax + 3*w]);
             end
 
-            ylabel(yLabel,'FontSize',11,'Interpreter','latex');
+            % ylabel(yLabel,'FontSize',11,'Interpreter','latex');  % NatComm: original
+            ylabel(yLabel,'FontSize',7,'Interpreter','latex');
 
             % --- FORCE Y-LIMITS per figure sets ---
             if enforceLFPTicks_1to6   % LFP set (Figures 2–5)
@@ -481,14 +483,14 @@ function fig = plot_ChemistryVoltageGroups(data_LFP_all, data_NMC_all, ~, outDir
         {[0.2 0.2 1],[0 0 0.6],[1 0.6 0.2],[1 0.3 0],[0.6 0 0]} );
 
     fig = figure('Color','w','Visible','off','Position',[200 100 900 800]); 
-    t = tiledlayout(2,1,"TileSpacing","compact","Padding","compact");
+    tiledlayout(2,1,"TileSpacing","compact","Padding","compact");
 
     % meanEFC (upper)
     ax1 = nexttile; hold(ax1, 'on');
     [~,labelTops_mean,whiskerLows_mean] = drawGroupedBoxax_clustered( ...
         all_data, inCats, group2x, color_map, xpos, 'meanEFC', 'NMC 800V');
 
-    ylabel(ax1,'$\bar{\chi}_{\epsilon}$ [\%]','Interpreter','latex','FontSize',13);
+    ylabel(ax1,'$\bar{\chi}_{\epsilon}$ [\%]','Interpreter','latex','FontSize',7);
     grid(ax1,'on'); box(ax1,'on'); applyPaddedYLimits(ax1,labelTops_mean,whiskerLows_mean);
     set(ax1,'YTick',[0 10 20 30]);
     ylim(ax1, [0, 30]);   % FIXED limits for Figure 6
@@ -497,7 +499,7 @@ function fig = plot_ChemistryVoltageGroups(data_LFP_all, data_NMC_all, ~, outDir
     % stdEFC (lower)
     ax2 = nexttile; hold(ax2, 'on');
     [~,labelTops_std,whiskerLows_std] = drawGroupedBoxax_clustered(all_data, inCats, group2x, color_map, xpos, 'stdEFC', true);
-    ylabel(ax2,'$s_{\chi_{\epsilon}}$ [\%]','Interpreter','latex','FontSize',13);
+    ylabel(ax2,'$s_{\chi_{\epsilon}}$ [\%]','Interpreter','latex','FontSize',7);
     grid(ax2,'on'); box(ax2,'on'); applyPaddedYLimits(ax2,labelTops_std,whiskerLows_std);
     set(ax2,'YTick',[1 3 5]);
     ylim(ax2, [0.8, 6]);  % FIXED limits for Figure 6
@@ -544,12 +546,12 @@ function fig = plot_ChemistryTwoGroups_NominalThermal(data_LFP_all, data_NMC_all
     color_map = containers.Map({'LFP','NMC'}, {[0 0 1],[1 0.5 0]});
 
     fig = figure('Color','w','Visible','off','Position',[200 120 900 800]); 
-    t = tiledlayout(2,1,"TileSpacing","compact","Padding","compact");
+    tiledlayout(2,1,"TileSpacing","compact","Padding","compact");
 
     % meanEFC (upper)
     ax1 = nexttile; hold(ax1,'on');
     [~,labelTops_mean,whiskerLows_mean] = drawGroupedBoxax_simple(T, groupCats, group2x, color_map, xpos, 'meanEFC', 'Cat');
-    ylabel(ax1,'$\bar{\chi}_{\epsilon}$ [\%]','Interpreter','latex','FontSize',13);
+    ylabel(ax1,'$\bar{\chi}_{\epsilon}$ [\%]','Interpreter','latex','FontSize',7);
     grid(ax1,'on'); box(ax1,'on'); applyPaddedYLimits(ax1,labelTops_mean,whiskerLows_mean);
     if enforceNMCTicks, set(ax1,'YTick',[0 10 20 30]); end
     ylim(ax1, [0, 30]);    % FIXED limits
@@ -560,7 +562,7 @@ function fig = plot_ChemistryTwoGroups_NominalThermal(data_LFP_all, data_NMC_all
     % stdEFC (lower)
     ax2 = nexttile; hold(ax2,'on');
     [~,labelTops_std,whiskerLows_std] = drawGroupedBoxax_simple(T, groupCats, group2x, color_map, xpos, 'stdEFC', 'Cat');
-    ylabel(ax2,'$s_{\chi_{\epsilon}}$ [\%]','Interpreter','latex','FontSize',13);
+    ylabel(ax2,'$s_{\chi_{\epsilon}}$ [\%]','Interpreter','latex','FontSize',7);
     grid(ax2,'on'); box(ax2,'on'); applyPaddedYLimits(ax2,labelTops_std,whiskerLows_std);
     if enforceNMCTicks, set(ax2,'YTick',[0 2 4 6]); end
     ylim(ax2, [0, 6]);     % FIXED limits
@@ -580,9 +582,6 @@ end
 function [stats, labelTops, whiskerLows] = drawGroupedBoxax_simple(T, groupCats, group2x, color_map, xpos, yColName, groupVar)
     Nc = numel(groupCats);
     box_width=0.55; 
-    %redCol=[0.85 0 0]; 
-    %labelBG=[1.0 0.95 0.95]; 
-    %labelEdge=redCol;
     stats = repmat(struct('x',[],'wlow',[],'q1',[],'median',[],'q3',[],'whigh',[]),1,Nc);
     labelTops=[]; whiskerLows=[]; hold on;
 
@@ -604,9 +603,9 @@ function [stats, labelTops, whiskerLows] = drawGroupedBoxax_simple(T, groupCats,
         spread = range(y); if ~isfinite(spread)||spread<=0, spread=max(IQR,1); end
         yText = whi + 0.02*spread;
         txt = text(xi,yText,sprintf('%.2f',q2),'HorizontalAlignment','center','VerticalAlignment','bottom', ...
-                   'FontSize',8,'FontWeight','bold','Interpreter','latex','Color',[0.85 0 0], ...
+                   'FontSize',6,'FontWeight','bold','Interpreter','latex','Color',[0.85 0 0], ...
                    'Margin',0.5,'BackgroundColor',[1.0 0.95 0.95],'EdgeColor',[0.85 0 0],'LineWidth',0.4,'Clipping','off');
-        set(txt,'Units','data'); ext=get(txt,'Extent'); 
+        set(txt,'Units','data'); ext=get(txt,'Extent');        
         labelTops(end+1)=ext(2)+ext(4); %#ok<AGROW>
         whiskerLows(end+1)=wlow; %#ok<AGROW>
 
@@ -665,8 +664,8 @@ function [stats, labelTops, whiskerLows] = drawGroupedBoxax_clustered(all_data, 
         end
 
         txt = text(xi,yText,sprintf('%.2f',q2),'HorizontalAlignment','center','VerticalAlignment',vAlign, ...
-                   'FontSize',8,'FontWeight','bold','Interpreter','latex','Color',redCol, ...
-                   'Margin',0.5,'BackgroundColor',labelBG,'EdgeColor',labelEdge,'LineWidth',0.4,'Clipping','off');
+                   'FontSize',6,'FontWeight','bold','Interpreter','latex','Color',redCol, ...
+                   'Margin',0.5,'BackgroundColor',labelBG,'EdgeColor',labelEdge,'LineWidth',0.4,'Clipping','off');        
 
         set(txt,'Units','data'); ext=get(txt,'Extent');
         labelTops(end+1)=ext(2)+ext(4); %#ok<AGROW>
@@ -705,7 +704,7 @@ end
 function setBottomXAxisLabel(fig, labelStr)
     axLower = findobj(fig, 'Type','Axes', 'Tag','lower');
     if ~isempty(axLower) && (isstring(labelStr) || ischar(labelStr))
-        xlabel(axLower(1), labelStr, 'Interpreter','latex', 'FontSize', 11);
+        xlabel(axLower(1), labelStr, 'Interpreter','latex', 'FontSize', 7);
     end
 end
 
@@ -796,7 +795,7 @@ function destFig = exportCombinedGridA4Exact(srcFigs, gridRC, OUT_PDF, OUT_FIG, 
     % Export graphics
     %exportgraphics(destFig, outBase + "_epsformat.eps", 'ContentType','vector');        
     exportgraphics(destFig, OUT_PDF, 'ContentType','vector');
-    %savefig(destFig, OUT_FIG);
+    savefig(destFig, OUT_FIG);
 
 end
 
@@ -822,8 +821,8 @@ function copyAxisContents(axSrc, axDest)
     axDest.XTick = axSrc.XTick; axDest.YTick = axSrc.YTick;
     try axDest.XTickLabel = axSrc.XTickLabel; catch, end
     axDest.TickLabelInterpreter = getOrDefault(axSrc,'TickLabelInterpreter','latex');
-    axDest.FontName = getOrDefault(axSrc,'FontName','Times');
-    axDest.FontSize = getOrDefault(axSrc,'FontSize',11);
+    axDest.FontName = getOrDefault(axSrc,'FontName','Arial');
+    axDest.FontSize = getOrDefault(axSrc,'FontSize',7);
     axDest.Box = 'on';
     axDest.Layer = 'top';
 end
